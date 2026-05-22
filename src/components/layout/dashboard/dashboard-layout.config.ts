@@ -1,14 +1,14 @@
+import { ChartColumnIncreasingIcon } from "@/components/ui/chart-column-increasing";
+import { CheckCheckIcon } from "@/components/ui/check-check";
+import { FolderKanbanIcon } from "@/components/ui/folder-kanban";
+import { LayoutPanelTopIcon } from "@/components/ui/layout-panel-top";
+import { UsersIcon } from "@/components/ui/users";
 import type { User } from "@/redux/feature/auth/authSlice";
 import type {
   ForwardRefExoticComponent,
   HTMLAttributes,
   RefAttributes,
 } from "react";
-import { ChartColumnIncreasingIcon } from "@/components/ui/chart-column-increasing";
-import { CheckCheckIcon } from "@/components/ui/check-check";
-import { FolderKanbanIcon } from "@/components/ui/folder-kanban";
-import { LayoutPanelTopIcon } from "@/components/ui/layout-panel-top";
-import { UsersIcon } from "@/components/ui/users";
 
 export type AnimatedIconHandle = {
   startAnimation: () => void;
@@ -28,7 +28,7 @@ export type DashboardNavItem = {
 };
 
 const adminNavItems: DashboardNavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutPanelTopIcon },
+  { name: "Dashboard", href: "/", icon: LayoutPanelTopIcon },
   { name: "Projects", href: "/projects", icon: FolderKanbanIcon },
   { name: "Tasks", href: "/tasks", icon: CheckCheckIcon },
   { name: "Team", href: "/team", icon: UsersIcon },
@@ -48,7 +48,7 @@ const routeTitles = [
   { match: "/reports", label: "Reports / Overview" },
   { match: "/my-tasks", label: "Dashboard / My Tasks" },
   { match: "/my-projects", label: "Projects / My Workspaces" },
-  { match: "/dashboard", label: "Dashboard / Overview" },
+  { match: "/", label: "Dashboard / Overview" },
 ];
 
 export function isAdminRole(role?: User["role"]) {
@@ -76,8 +76,8 @@ export function isAdministrativePath(pathname: string) {
 }
 
 export function isActiveNavItem(href: string, pathname: string) {
-  if (href === "/dashboard") {
-    return pathname === "/dashboard" || pathname === "/";
+  if (href === "/") {
+    return pathname === "/" || pathname === "/";
   }
 
   return pathname.startsWith(href);

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import DashboardView from "../../../view/admin/DashboardView";
 
-export default function RootPage() {
-  redirect("/dashboard");
+export default function page() {
+  return <DashboardView />;
 }

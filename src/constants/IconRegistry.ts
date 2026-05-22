@@ -1,14 +1,14 @@
 import {
-  Folder,
+  AlertCircle,
+  BarChart,
+  Calendar,
   CheckSquare,
+  FileText,
+  Folder,
+  Inbox,
+  Layers,
   Settings,
   Users,
-  BarChart,
-  FileText,
-  Calendar,
-  Layers,
-  Inbox,
-  AlertCircle,
 } from "lucide-react";
 
 const IconRegistry = [

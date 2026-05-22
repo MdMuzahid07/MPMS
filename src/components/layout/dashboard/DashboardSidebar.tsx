@@ -15,7 +15,6 @@ import { SunMoonIcon } from "@/components/ui/sun-moon";
 import type { User } from "@/redux/feature/auth/authSlice";
 import {
   ArrowRight,
-  CalendarDays,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
@@ -169,22 +168,6 @@ export function DashboardSidebar({
               <SidebarNavItem isActive={isActive} item={item} key={item.name} />
             );
           })}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              tooltip="Calendar"
-              className="hover:bg-sidebar-accent hover:text-sidebar-foreground active:bg-sidebar-accent h-10 rounded-md px-3 text-[14px] font-medium"
-            >
-              <Link href="/reports">
-                <span className="flex size-5 shrink-0 items-center justify-center">
-                  <CalendarDays className="size-4.5" />
-                </span>
-                <span className="group-data-[collapsible=icon]:hidden">
-                  Calendar
-                </span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
 
         <div className="mt-5 mb-2 flex items-center justify-between px-2 group-data-[collapsible=icon]:hidden">

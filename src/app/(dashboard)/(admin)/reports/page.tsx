@@ -1,5 +1,5 @@
-const page = () => {
-  return <div>page</div>;
-};
+import ReportView from "../../../../view/admin/ReportView";
 
-export default page;
+export default function page() {
+  return <ReportView />;
+}

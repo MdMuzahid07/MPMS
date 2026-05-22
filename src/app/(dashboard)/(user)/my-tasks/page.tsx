@@ -1,5 +1,5 @@
-const page = () => {
-  return <div>page</div>;
-};
+import MyTasksView from "../../../../view/user/MyTasksView";
 
-export default page;
+export default function page() {
+  return <MyTasksView />;
+}

@@ -49,6 +49,7 @@ export function DashboardShell({
       <SidebarInset className="dark:bg-background min-h-dvh min-w-0 bg-[#f4f7fb]">
         <DashboardTopbar
           onLogout={onLogout}
+          pathname={pathname}
           pageTitle={pageTitle}
           user={user}
         />

@@ -1,5 +1,5 @@
-const page = () => {
-  return <div>page</div>;
-};
+import TeamView from "../../../../view/admin/team/TeamView";
 
-export default page;
+export default function page() {
+  return <TeamView />;
+}

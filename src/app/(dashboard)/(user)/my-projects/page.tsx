@@ -1,5 +1,5 @@
-const page = () => {
-  return <div>page</div>;
-};
+import MyProjectsView from "../../../../view/user/MyProjectsView";
 
-export default page;
+export default function page() {
+  return <MyProjectsView />;
+}
