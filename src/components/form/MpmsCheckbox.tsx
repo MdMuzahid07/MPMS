@@ -1,5 +1,6 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -26,8 +27,8 @@ const MpmsCheckbox = ({
   const hasError = !!errors[name];
 
   return (
-    <div className={cn("space-y-1", className)}>
-      <div className="flex items-start gap-2">
+    <div className={cn("space-y-2", className)}>
+      <div className="flex items-center gap-2">
         <Controller
           name={name}
           control={control}
@@ -36,36 +37,32 @@ const MpmsCheckbox = ({
               type="checkbox"
               id={name}
               className={cn(
-                "mt-1 h-4 w-4 cursor-pointer rounded border border-slate-300 bg-white text-indigo-600 focus:ring-indigo-500/20 focus:ring-offset-0 dark:border-[#1e1e2e] dark:bg-[#111118]",
+                "h-4 w-4 cursor-pointer rounded text-green-600",
                 disabled && "cursor-not-allowed opacity-50",
-                hasError && "border-red-500 focus:border-red-500",
+                hasError && "border-destructive",
               )}
               checked={field.value || false}
-              onChange={(e) => field.onChange(e.target.checked)}
+              onChange={field.onChange}
               disabled={disabled}
             />
           )}
         />
-        <div className="grid gap-1.5 leading-none">
-          <label
-            htmlFor={name}
-            className={cn(
-              "cursor-pointer text-sm font-medium select-none",
-              disabled && "cursor-not-allowed opacity-50",
-              hasError ? "text-red-500" : "text-slate-700 dark:text-slate-300",
-            )}
-          >
-            {label}
-          </label>
-          {description && !hasError && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {description}
-            </p>
+        <Label
+          htmlFor={name}
+          className={cn(
+            "cursor-pointer font-normal",
+            disabled && "cursor-not-allowed opacity-50",
+            hasError && "text-destructive",
           )}
-        </div>
+        >
+          {label}
+        </Label>
       </div>
+      {description && !hasError && (
+        <p className="text-muted-foreground ml-6 text-sm">{description}</p>
+      )}
       {hasError && (
-        <p className="ml-6 text-[11px] font-medium text-red-500">
+        <p className="text-destructive ml-6 text-sm">
           {errors[name]?.message as string}
         </p>
       )}

@@ -59,12 +59,7 @@ const LoginPageView = () => {
   const [login, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    setValue,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
+  const methods = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -72,6 +67,13 @@ const LoginPageView = () => {
       rememberMe: false,
     },
   });
+
+  const {
+    register,
+    setValue,
+    setError,
+    formState: { errors, isSubmitting },
+  } = methods;
 
   const handleQuickSelect = (email: string, password: string) => {
     setValue("email", email, { shouldValidate: true });
@@ -157,7 +159,7 @@ const LoginPageView = () => {
             </p>
           </header>
 
-          <MpmsForm onSubmit={onSubmit}>
+          <MpmsForm onSubmit={onSubmit} methods={methods}>
             <fieldset className="space-y-4" disabled={busy}>
               <legend className="sr-only">Account credentials</legend>
 

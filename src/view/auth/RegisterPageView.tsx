@@ -104,11 +104,7 @@ const RegisterPageView = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordValue, setPasswordValue] = useState("");
 
-  const {
-    register: formRegister,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormValues>({
+  const methods = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
     defaultValues: {
@@ -118,6 +114,12 @@ const RegisterPageView = () => {
       confirmPassword: "",
     },
   });
+
+  const {
+    register: formRegister,
+    setError,
+    formState: { errors, isSubmitting },
+  } = methods;
 
   const strength = useMemo(() => getStrength(passwordValue), [passwordValue]);
   const strengthCfg = STRENGTH_CONFIG[strength.level];
@@ -188,7 +190,7 @@ const RegisterPageView = () => {
             </p>
           </header>
 
-          <MpmsForm onSubmit={onSubmit}>
+          <MpmsForm onSubmit={onSubmit} methods={methods}>
             <fieldset className="space-y-4" disabled={busy}>
               <legend className="sr-only">Account details</legend>
 

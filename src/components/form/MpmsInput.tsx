@@ -1,5 +1,7 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 
@@ -32,29 +34,21 @@ const MpmsInput = ({
   } = useFormContext();
 
   const sizeClasses = {
-    sm: "h-8 text-xs py-1 px-2",
-    md: "h-10 text-sm py-2 px-3",
-    lg: "h-12 text-sm py-3 px-4",
+    sm: "h-8 text-sm",
+    md: "h-9 text-sm",
+    lg: "h-10",
   };
 
   const hasError = !!errors[name];
 
   return (
-    <div className="w-full space-y-1">
-      <div className="flex items-center justify-between">
-        <label
-          htmlFor={name}
-          className={cn(
-            "text-[10px] font-semibold tracking-wider uppercase",
-            hasError ? "text-red-500" : "text-slate-400 dark:text-slate-500",
-          )}
-        >
-          {labelIcon && <span className="mr-1">{labelIcon}</span>}
-          {label}
-          {required && <span className="ml-0.5 text-red-500">*</span>}
-        </label>
-      </div>
-      <input
+    <div className="w-full space-y-2">
+      <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
+        {labelIcon && <span className="mr-1 inline-block">{labelIcon}</span>}
+        {label}
+        {required && <span className="text-destructive ml-1">*</span>}
+      </Label>
+      <Input
         {...register(name, {
           required: required ? `${label} is required` : false,
         })}
@@ -63,19 +57,13 @@ const MpmsInput = ({
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          "w-full rounded-md border bg-white text-slate-900 transition-all duration-200 outline-none dark:bg-[#111118]/80 dark:text-slate-100",
-          "border-slate-200 dark:border-[#1e1e2e]",
-          "focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20",
-          "placeholder-slate-400 dark:placeholder-slate-600",
-          disabled && "cursor-not-allowed opacity-50",
-          hasError &&
-            "border-red-500 focus:border-red-500 focus:ring-red-500/10",
           sizeClasses[size],
+          hasError && "border-destructive focus-visible:ring-destructive",
           className,
         )}
       />
       {hasError && (
-        <p className="animate-in fade-in slide-in-from-top-1 mt-1 text-[11px] leading-none font-medium text-red-500 duration-150">
+        <p className="text-destructive text-sm">
           {errors[name]?.message as string}
         </p>
       )}
