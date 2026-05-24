@@ -16,7 +16,7 @@ export const TeamStatCard = ({
   icon,
 }: TeamStatCardProps) => {
   return (
-    <Card className="rounded-lg border shadow-sm">
+    <Card className="rounded-xl">
       <CardContent className="flex h-36 flex-col justify-between p-5">
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.16em] uppercase">

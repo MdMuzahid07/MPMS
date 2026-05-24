@@ -11,11 +11,13 @@ import { TeamMemberActionsMenu } from "./TeamMemberActionsMenu";
 interface TeamMemberRowProps {
   member: TeamMember;
   onSuspendToggle: (member: TeamMember) => void;
+  onDeleteClick?: (member: TeamMember) => void;
 }
 
 export const TeamMemberRow = ({
   member,
   onSuspendToggle,
+  onDeleteClick,
 }: TeamMemberRowProps) => {
   const isInactive = member.status === "Inactive";
 
@@ -71,6 +73,7 @@ export const TeamMemberRow = ({
         <TeamMemberActionsMenu
           member={member}
           onSuspendToggle={onSuspendToggle}
+          onDeleteClick={onDeleteClick}
         />
       </td>
     </tr>

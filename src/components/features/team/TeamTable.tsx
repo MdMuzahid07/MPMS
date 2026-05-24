@@ -6,9 +6,14 @@ import { TeamMemberRow } from "./TeamMemberRow";
 interface TeamTableProps {
   members: TeamMember[];
   onSuspendToggle: (member: TeamMember) => void;
+  onDeleteClick?: (member: TeamMember) => void;
 }
 
-export const TeamTable = ({ members, onSuspendToggle }: TeamTableProps) => {
+export const TeamTable = ({
+  members,
+  onSuspendToggle,
+  onDeleteClick,
+}: TeamTableProps) => {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-245 border-collapse">
@@ -38,6 +43,7 @@ export const TeamTable = ({ members, onSuspendToggle }: TeamTableProps) => {
               key={member.id}
               member={member}
               onSuspendToggle={onSuspendToggle}
+              onDeleteClick={onDeleteClick}
             />
           ))}
         </tbody>

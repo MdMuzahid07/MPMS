@@ -9,7 +9,7 @@ import { useGetMeQuery, useLogoutMutation } from "@/redux/feature/auth/authApi";
 import { logout, setCredentials } from "@/redux/feature/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function DashboardLayout({
@@ -21,13 +21,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { accessToken, user } = useAppSelector((state) => state.auth);
-  const [storedToken] = useState<string | null>(() =>
-    typeof window !== "undefined"
-      ? window.localStorage.getItem("accessToken")
-      : null,
-  );
-
-  const token = accessToken ?? storedToken;
+  const token = accessToken;
   const shouldFetchUser = !!token && !user;
 
   const {

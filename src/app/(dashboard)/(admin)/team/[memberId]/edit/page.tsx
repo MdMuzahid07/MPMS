@@ -1,5 +1,10 @@
 import TeamMemberEditView from "../../../../../../view/admin/team/TeamMemberEditView";
 
-export default function page({ params }: { params: { memberId: string } }) {
-  return <TeamMemberEditView params={params} />;
+export default async function page({
+  params,
+}: {
+  params: Promise<{ memberId: string }>;
+}) {
+  const { memberId } = await params;
+  return <TeamMemberEditView memberId={memberId} />;
 }

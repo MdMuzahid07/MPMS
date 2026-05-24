@@ -1,199 +1,319 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DeleteConfirmationModal } from "@/components/features/tasks/DeleteConfirmationModal";
 import {
+  AddMemberDialog,
+  TeamEmptyState,
   TeamHeader,
   TeamMember,
   TeamSearchBar,
   TeamStatCard,
   TeamTable,
   TeamTableFooter,
+  TeamTableSkeleton,
 } from "@/components/features/team";
-import { BrainCircuit, Rocket, Users } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  useDeleteUserMutation,
+  useGetUsersQuery,
+  useUpdateUserMutation,
+} from "@/redux/feature/users/usersApi";
+import { BrainCircuit, Rocket, ShieldAlert, Users } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-// ============================================
-// Constants
-// ============================================
-
-const TEAM_MEMBERS: TeamMember[] = [
-  {
-    id: "1",
-    name: "Alex Rivera",
-    email: "alex.rivera@mpms.tech",
-    role: "Admin",
-    department: "Core Infrastructure",
-    skills: ["Kubernetes", "Go"],
-    status: "Active",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuATgT_j39Dxn-QI-GQjdgdzE9NFGj7Or9TP0Z_7sk4atsrM3BlONtmsmpP7Bkzzj2ewAJZCbQI9ci5GI_QbEeJZfsGU0c8XaQ1SGjWnPQXAg_zxHuhcwOrkq_J8zdq9wCCyOkVkZHMcG0m1BDEYMnXHJ6-vlDMQcFDB_ClCLNkJKzZV8tZK6pMcypm0eGj8s2whEous3XBosMO8gcD2h6du4CZjvWSu6XcDo9Ri7_qLzfmx3AmK51bYI5wGDzquDLtiWA9EKpY4c0BO",
-  },
-  {
-    id: "2",
-    name: "Sarah Chen",
-    email: "s.chen@mpms.tech",
-    role: "Manager",
-    department: "Product Design",
-    skills: ["React", "TypeScript", "Figma"],
-    status: "Active",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCX5P28pGOPSrfMPRxrqgsA5o9T2Eyk7JYqJQRGpHkh0lcq0e_NTqb23KgwYnbiBE45pO6Es-LuPHGQP_KKOH0Ce-hagGX2bytEomUu-B56veNjwSEGvyt8kLJ8ymJbXc7iek5FFlCKc4UXACq6Lm0uNaEYOe8x-gqD26hBnPpUQzi62ExVtYiaCyxp6YrKpnCg5txWsZBsWNrsp4postkKhXwJuKcqLPBMbLWUuWlAQPWUaEPyND4btuIpzRkFXe6JzpRDHp_enTnk",
-  },
-  {
-    id: "3",
-    name: "Marcus Thorne",
-    email: "m.thorne@mpms.tech",
-    role: "Member",
-    department: "Backend Systems",
-    skills: ["Rust", "PostgreSQL"],
-    status: "Inactive",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAzqzcFNW9tG1r4jChfW05tFWsarScd6TSQBrlhVamuGO8X_vVkxT82TomyAtW7lB7ixY2PAKwjTzLrtnS-DyuDcFXkExaqitB3zC2XogTEOnubjY8PwnBZc-g50q84tuwJEorQqdVgHqlv0sItzeCKQc2FoZlR52K5EeZXHKxHzogsyWler-_O9Sr-GmooNG1wYVYCWfNJLno2COPwX6jt_yLxvhJAqX5fGFQdl9tnb56CXSvQKWkiAhl1stnQLmamwnL_7EWhZuQ6",
-  },
-  {
-    id: "4",
-    name: "Elena Vance",
-    email: "e.vance@mpms.tech",
-    role: "Member",
-    department: "Cybersecurity",
-    skills: ["Python", "Ethical Hacking"],
-    status: "Active",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAWvC2ZxBqppJXjYHHq4q8exBnTAlQ1F-u53yA3TMzNJJ1Eny1EkJRJ0SsHvVNR3OLWTMZNt-WAsxOxlDirBULHaEA19x-Lxpt8ckDf28yxvxOr_c5QIdTDXcGjPq2H-XZ6XoOSdnPwba_XADHJ3-GZhWL9dON-EOtdn_aprxCdrAsowaStiifQCGQZLrYQ04uGOtTHqYOr28cM4GLxI1lufLRWKnGDehTimaTP9PXE856vv6VpPn1RWBPK4Yb3wzga84SEtLRB8vfj",
-  },
-];
-
-// Main Team View logic (uses components exported from components/team)
-
-interface TeamViewProps {
-  initialMembers?: TeamMember[];
-  totalHeadcount?: number;
-  onAddMember?: () => void;
-}
-
-export const TeamView = ({
-  initialMembers = TEAM_MEMBERS,
-  totalHeadcount = 48,
-  onAddMember,
-}: TeamViewProps) => {
+export const TeamView = () => {
+  // ======= Queries & Filters State =======
   const [searchValue, setSearchValue] = useState("");
-  const [memberRows, setMemberRows] = useState<TeamMember[]>(initialMembers);
-  const [memberPendingSuspend, setMemberPendingSuspend] =
-    useState<TeamMember | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const pageSize = 10;
 
-  const filteredMembers = useMemo(() => {
-    const q = searchValue.trim().toLowerCase();
-    if (!q) return memberRows;
-    return memberRows.filter((member) => {
-      return (
-        member.name.toLowerCase().includes(q) ||
-        member.email.toLowerCase().includes(q) ||
-        member.department.toLowerCase().includes(q) ||
-        member.role.toLowerCase().includes(q) ||
-        member.skills.some((s) => s.toLowerCase().includes(q))
-      );
-    });
-  }, [memberRows, searchValue]);
+  // ======= Modals & Action States =======
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [memberPendingSuspend, setMemberPendingSuspend] =
+    useState<TeamMember | null>(null);
+  const [memberPendingDelete, setMemberPendingDelete] =
+    useState<TeamMember | null>(null);
 
-  const paginatedMembers = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredMembers.slice(start, start + pageSize);
-  }, [filteredMembers, currentPage, pageSize]);
+  // ======= RTK Query Hooks =======
+  const { data, isLoading, isError, error, refetch } = useGetUsersQuery({
+    page: currentPage,
+    limit: pageSize,
+    search: searchValue,
+    role: roleFilter,
+    status: statusFilter,
+  });
 
-  const totalPages = Math.ceil(filteredMembers.length / pageSize);
-
-  const handleSuspendToggle = (member: TeamMember) =>
-    setMemberPendingSuspend(member);
-
-  const confirmSuspendToggle = () => {
-    if (!memberPendingSuspend) return;
-    setMemberRows((prev) =>
-      prev.map((m) =>
-        m.id === memberPendingSuspend.id
-          ? { ...m, status: m.status === "Active" ? "Inactive" : "Active" }
-          : m,
-      ),
-    );
-    setMemberPendingSuspend(null);
-  };
+  const [updateUser] = useUpdateUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const getDeleteModalConfig = () => {
+  // ======= Intercept Search Click Event to prevent routing to "/team/new" and trigger inline Dialog instead =======
+  const handleAddMemberClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setIsAddOpen(true);
+  };
+
+  // ======= Suspend/Reactivate toggle =======
+  const confirmSuspendToggle = async () => {
+    if (!memberPendingSuspend) return;
+    const isCurrentlyActive = memberPendingSuspend.status === "Active";
+    const nextStatus = isCurrentlyActive ? "inactive" : "active";
+
+    const promise = updateUser({
+      id: memberPendingSuspend.id,
+      body: { status: nextStatus },
+    }).unwrap();
+
+    toast.promise(promise, {
+      loading: `${isCurrentlyActive ? "Suspending" : "Reactivating"} team member...`,
+      success: () => {
+        setMemberPendingSuspend(null);
+        return `Team member successfully ${isCurrentlyActive ? "suspended" : "reactivated"}!`;
+      },
+      error: (err: any) =>
+        err?.data?.message || "Failed to update member status.",
+    });
+  };
+
+  // ======= Delete Member Confirm =======
+  const confirmDeleteMember = async () => {
+    if (!memberPendingDelete) return;
+
+    const promise = deleteUser(memberPendingDelete.id).unwrap();
+
+    toast.promise(promise, {
+      loading: "Deleting team member...",
+      success: () => {
+        setMemberPendingDelete(null);
+        return "Team member successfully deleted from directory!";
+      },
+      error: (err: any) =>
+        err?.data?.message || "Failed to delete team member.",
+    });
+  };
+
+  // ======= Suspension configurations =======
+  const getSuspendConfig = () => {
     if (!memberPendingSuspend)
       return { title: "", description: "", confirmLabel: "" };
     const isActive = memberPendingSuspend.status === "Active";
     return {
-      title: isActive ? "Suspend team member?" : "Activate team member?",
+      title: isActive ? "Suspend team member?" : "Reactivate team member?",
       description: isActive
-        ? `This will suspend "${memberPendingSuspend.name}" and restrict account access.`
-        : `This will reactivate "${memberPendingSuspend.name}" and restore account access.`,
+        ? `This will temporarily suspend "${memberPendingSuspend.name}" and restrict their platform permissions.`
+        : `This will restore full system and workspace access permissions for "${memberPendingSuspend.name}".`,
       confirmLabel: isActive ? "Suspend" : "Activate",
     };
   };
 
-  const modalConfig = getDeleteModalConfig();
+  const suspendConfig = getSuspendConfig();
+
+  // ======= ERROR HANDLER BOUNDARY =======
+  if (isError) {
+    const status = (error as any)?.status;
+    const isForbidden = status === 403;
+
+    if (isForbidden) {
+      return (
+        <div className="animate-in fade-in flex flex-col items-center justify-center py-16 text-center duration-200">
+          <div className="bg-destructive/10 text-destructive mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+            <ShieldAlert className="size-7" />
+          </div>
+          <h2 className="text-foreground text-lg font-bold">
+            Directory Access Restricted
+          </h2>
+          <p className="text-muted-foreground mt-2 max-w-sm text-xs leading-relaxed">
+            The team directory contains sensitive clearance roles and
+            infrastructure permissions. Only administrators and project managers
+            have access to view or update records here.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="animate-in fade-in flex flex-col items-center justify-center py-16 text-center duration-200">
+        <div className="bg-muted text-muted-foreground mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+          <ShieldAlert className="size-7" />
+        </div>
+        <h2 className="text-foreground text-lg font-bold">
+          Failed to Load Directory
+        </h2>
+        <p className="text-muted-foreground mt-2 max-w-sm text-xs leading-relaxed">
+          Could not establish secure database connection with the workspace
+          service. Please verify your connection status and try again.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-4 h-9 text-xs"
+          onClick={() => refetch()}
+        >
+          Retry Database Connection
+        </Button>
+      </div>
+    );
+  }
+
+  // ======= Derived properties from backend response =======
+  const members = data?.members || [];
+  const totalCount = data?.totalCount || 0;
+  const totalPages = data?.totalPages || 1;
+
+  // Calculate dynamic stats
+  const avgSkillsCount = members.length
+    ? (
+        members.reduce((acc, m) => acc + (m.skills?.length || 0), 0) /
+        members.length
+      ).toFixed(1)
+    : "0";
+  const activeMembersCount = members.filter(
+    (m) => m.status.toLowerCase() === "active",
+  ).length;
 
   return (
-    <div className="w-full space-y-6 pb-8">
+    <div className="animate-in fade-in w-full space-y-6 pb-8 duration-200">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <TeamHeader
           title="Organization Directory"
           description="Manage permissions, roles, and technical expertise across the organization."
         />
-        <TeamSearchBar
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
-          onAddMemberClick={onAddMember}
-        />
+
+        <div className="flex flex-wrap items-center gap-3">
+          {/* ======= Quick Filters ======= */}
+          <div className="flex h-9 items-center gap-2">
+            <Select
+              value={roleFilter}
+              onValueChange={(val) => {
+                setRoleFilter(val);
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="bg-muted text-muted-foreground h-9 w-32.5 border text-xs focus:ring-0 dark:bg-[#1b1b23]">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="bg-muted text-muted-foreground h-9 w-32.5 border text-xs focus:ring-0 dark:bg-[#1b1b23]">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <TeamSearchBar
+            searchValue={searchValue}
+            onSearchChange={(val) => {
+              setSearchValue(val);
+              setCurrentPage(1);
+            }}
+            onAddMemberClick={handleAddMemberClick}
+          />
+        </div>
       </section>
 
-      <section className="bg-card overflow-hidden rounded-lg border shadow-sm">
-        <TeamTable
-          members={paginatedMembers}
-          onSuspendToggle={handleSuspendToggle}
-        />
-        <TeamTableFooter
-          visibleCount={paginatedMembers.length}
-          totalCount={filteredMembers.length}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+      {/* ======= Main Members Directory Table ======= */}
+      <section className="bg-card overflow-hidden rounded-xl border">
+        {isLoading ? (
+          <TeamTableSkeleton />
+        ) : members.length === 0 ? (
+          <TeamEmptyState />
+        ) : (
+          <>
+            <TeamTable
+              members={members}
+              onSuspendToggle={setMemberPendingSuspend}
+              onDeleteClick={setMemberPendingDelete}
+            />
+            <TeamTableFooter
+              visibleCount={members.length}
+              totalCount={totalCount}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
+        )}
       </section>
 
+      {/* ======= Overview Stat Grid ======= */}
       <section className="grid gap-4 md:grid-cols-3">
         <TeamStatCard
           title="Total Headcount"
-          value={totalHeadcount.toString()}
-          description="+12% from last quarter"
+          value={isLoading ? "..." : totalCount.toString()}
+          description="Real-time synchronized headcount"
           icon={<Users className="size-4" />}
         />
         <TeamStatCard
           title="Avg. Expertise"
-          value="4.2/5"
-          description="Calculated across 12 skill sets"
-          icon={<BrainCircuit className="size-4 text-amber-500" />}
+          value={isLoading ? "..." : `${avgSkillsCount} Skills`}
+          description="Average skills per member"
+          icon={
+            <BrainCircuit className="size-4 animate-pulse text-amber-500" />
+          }
         />
         <TeamStatCard
-          title="Active Projects"
-          value="14"
-          description="8 critical milestones this week"
-          icon={<Rocket className="size-4" />}
+          title="Active Members"
+          value={isLoading ? "..." : activeMembersCount.toString()}
+          description="Members currently active in the directory"
+          icon={<Rocket className="text-primary size-4" />}
         />
       </section>
 
+      {/* ======= Modals ======= */}
+      <AddMemberDialog open={isAddOpen} onOpenChange={setIsAddOpen} />
+
+      {/* ======= SUSPEND MODAL DIALOG ======= */}
       <DeleteConfirmationModal
         open={Boolean(memberPendingSuspend)}
         onOpenChange={(open) => {
           if (!open) setMemberPendingSuspend(null);
         }}
-        title={modalConfig.title}
-        description={modalConfig.description}
-        confirmLabel={modalConfig.confirmLabel}
+        title={suspendConfig.title}
+        description={suspendConfig.description}
+        confirmLabel={suspendConfig.confirmLabel}
         onConfirm={confirmSuspendToggle}
+      />
+
+      {/* ======= DELETE CONFIRMATION DIALOG ======= */}
+      <DeleteConfirmationModal
+        open={Boolean(memberPendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setMemberPendingDelete(null);
+        }}
+        title="Delete team member permanently?"
+        description={`This will permanently delete "${memberPendingDelete?.name}" from the system. This action is irreversible and will remove all their active permissions.`}
+        confirmLabel="Delete permanently"
+        onConfirm={confirmDeleteMember}
       />
     </div>
   );

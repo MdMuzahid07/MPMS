@@ -40,28 +40,37 @@ const baseQueryWithRefreshToken = async (
 ) => {
   // we can call our baseQuery here with this three arguments received in custom base query
   let result = await baseQuery(args, api, extraOptions);
-  let res;
+  let res: Response | undefined;
   if (result?.error?.status === 401 && url) {
-    res = await fetch(`${url}/auth/refresh`, {
+    res = await fetch(`${url}/auth/refresh-token`, {
       method: "POST",
       credentials: "include",
     });
   }
 
   if (res) {
-    const data = await res.json();
+    if (res.ok) {
+      try {
+        const data = await res.json();
 
-    if (data?.data?.accessToken) {
-      const user = (api.getState() as RootState).auth.user;
+        if (data?.data?.accessToken) {
+          const user = (api.getState() as RootState).auth.user;
 
-      await api.dispatch(
-        setCredentials({
-          user,
-          accessToken: data?.data?.accessToken,
-        }),
-      );
+          await api.dispatch(
+            setCredentials({
+              user,
+              accessToken: data?.data?.accessToken,
+            }),
+          );
 
-      result = await baseQuery(args, api, extraOptions);
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(logout());
+        }
+      } catch (err) {
+        console.error("Failed to parse refresh token response", err);
+        api.dispatch(logout());
+      }
     } else {
       api.dispatch(logout());
     }

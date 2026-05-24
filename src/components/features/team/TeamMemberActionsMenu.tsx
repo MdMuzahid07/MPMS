@@ -7,18 +7,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, FilePenLine, Info, ShieldBan } from "lucide-react";
+import {
+  EllipsisVertical,
+  FilePenLine,
+  Info,
+  ShieldBan,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import type { TeamMember } from "./team.types";
 
 interface TeamMemberActionsMenuProps {
   member: TeamMember;
   onSuspendToggle: (member: TeamMember) => void;
+  onDeleteClick?: (member: TeamMember) => void;
 }
 
 export const TeamMemberActionsMenu = ({
   member,
   onSuspendToggle,
+  onDeleteClick,
 }: TeamMemberActionsMenuProps) => {
   const detailsUrl = `/team/${member.id}`;
   const editUrl = `/team/${member.id}/edit`;
@@ -43,13 +51,19 @@ export const TeamMemberActionsMenu = ({
             Edit
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => onSuspendToggle(member)}
-        >
+        <DropdownMenuItem onSelect={() => onSuspendToggle(member)}>
           <ShieldBan className="size-3.5" />
           {member.status === "Active" ? "Suspend" : "Activate"}
         </DropdownMenuItem>
+        {onDeleteClick && (
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => onDeleteClick(member)}
+          >
+            <Trash2 className="size-3.5" />
+            Delete Member
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
