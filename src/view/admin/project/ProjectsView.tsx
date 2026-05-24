@@ -1,7 +1,10 @@
 "use client";
 
-import { Project, ProjectCard } from "@/components/projects/ProjectCard";
-import { DeleteConfirmationModal } from "@/components/tasks/DeleteConfirmationModal";
+import {
+  Project,
+  ProjectCard,
+} from "@/components/features/projects/ProjectCard";
+import { DeleteConfirmationModal } from "@/components/features/tasks/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

@@ -4,7 +4,7 @@ import {
   DashboardLoading,
   DashboardShell,
   isAdministrativePath,
-} from "@/components/layout/dashboard";
+} from "@/components/features/layout/dashboard";
 import { useGetMeQuery, useLogoutMutation } from "@/redux/feature/auth/authApi";
 import { logout, setCredentials } from "@/redux/feature/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";

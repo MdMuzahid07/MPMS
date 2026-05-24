@@ -1,8 +1,8 @@
 "use client";
 
-import MpmsCheckbox from "@/components/form/MpmsCheckbox";
-import MpmsForm from "@/components/form/MpmsForm";
-import MpmsInput from "@/components/form/MpmsInput";
+import MpmsCheckbox from "@/components/features/form/MpmsCheckbox";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
 import { useLoginMutation } from "@/redux/feature/auth/authApi";
 import { setCredentials } from "@/redux/feature/auth/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,23 +14,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { z } from "zod";
+import { loginSchema, LoginFormValues } from "./auth.schema";
 import AuthHero from "./AuthHero";
-
-//Validation schema
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(6, "Password must be at least 6 characters"),
-  rememberMe: z.boolean().optional(),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 const DEMO_ACCOUNTS = [
   {

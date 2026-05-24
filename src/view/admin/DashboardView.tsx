@@ -1,9 +1,9 @@
 "use client";
 
-import FocusSection from "@/components/dashboard/FocusSection";
-import ProjectsTable from "@/components/dashboard/ProjectsTable";
-import StatBlock from "@/components/dashboard/StatBlock";
-import VelocityTrend from "@/components/dashboard/VelocityTrend";
+import FocusSection from "@/components/features/dashboard-overview/FocusSection";
+import ProjectsTable from "@/components/features/dashboard-overview/ProjectsTable";
+import StatBlock from "@/components/features/dashboard-overview/StatBlock";
+import VelocityTrend from "@/components/features/dashboard-overview/VelocityTrend";
 import { BarChart3, Bolt, BriefcaseBusiness, ListChecks } from "lucide-react";
 import type { ReactNode } from "react";
 

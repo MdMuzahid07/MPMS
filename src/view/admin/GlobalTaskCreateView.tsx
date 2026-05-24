@@ -1,4 +1,4 @@
-import { TaskUpsertForm } from "@/components/tasks/TaskUpsertForm";
+import { TaskUpsertForm } from "@/components/features/tasks/TaskUpsertForm";
 
 export default function GlobalTaskCreateView() {
   return (

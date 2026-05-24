@@ -20,7 +20,7 @@ import { Check, Search } from "lucide-react";
 
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import IconRegistry from "../../constants/IconRegistry";
+import IconRegistry from "@/constants/IconRegistry";
 
 interface MpmsIconPickerProps {
   name: string;

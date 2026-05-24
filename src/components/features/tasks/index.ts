@@ -9,3 +9,5 @@ export * from "./task.types";
 export * from "./TaskActionsMenu";
 export * from "./TaskRow";
 export * from "./TasksTable";
+export * from "./KanbanBoard";
+export * from "./TaskCanvas";

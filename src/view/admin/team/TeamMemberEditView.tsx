@@ -1,8 +1,8 @@
 "use client";
 
-import MpmsForm from "@/components/form/MpmsForm";
-import MpmsInput from "@/components/form/MpmsInput";
-import MpmsSelect from "@/components/form/MpmsSelect";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
+import MpmsSelect from "@/components/features/form/MpmsSelect";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";

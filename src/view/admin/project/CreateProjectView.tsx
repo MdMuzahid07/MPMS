@@ -1,4 +1,4 @@
-import { CreateProjectForm } from "@/components/projects/CreateProjectForm";
+import { CreateProjectForm } from "@/components/features/projects/CreateProjectForm";
 
 export default function CreateProjectView() {
   return (

@@ -1,7 +1,7 @@
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
 import "./globals.css";
@@ -54,7 +54,7 @@ export default function RootLayout({
           expand={true}
           richColors
           closeButton
-          theme="light"
+          theme="dark"
           duration={3000}
         />
       </body>

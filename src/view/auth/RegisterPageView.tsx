@@ -1,7 +1,7 @@
 "use client";
 
-import MpmsForm from "@/components/form/MpmsForm";
-import MpmsInput from "@/components/form/MpmsInput";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
 import { useRegisterMutation } from "@/redux/feature/auth/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 import AuthHero from "./AuthHero";
 
 // Password strength helpers
@@ -64,38 +63,7 @@ const STRENGTH_CONFIG: Record<
   strong: { label: "Strong", color: "bg-green-500", bars: 4 },
 };
 
-// Validation schema
-const registerSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "Full name is required")
-      .min(2, "Name must be at least 2 characters")
-      .max(80, "Name must be under 80 characters")
-      .regex(
-        /^[a-zA-Z\s'-]+$/,
-        "Name can only contain letters, spaces, hyphens, and apostrophes",
-      ),
-    email: z
-      .string()
-      .min(1, "Email is required")
-      .email("Enter a valid email address")
-      .max(254, "Email address is too long"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must include an uppercase letter")
-      .regex(/[a-z]/, "Password must include a lowercase letter")
-      .regex(/\d/, "Password must include a number")
-      .regex(/[^A-Za-z0-9]/, "Password must include a special character"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { registerSchema, RegisterFormValues } from "./auth.schema";
 
 const RegisterPageView = () => {
   const router = useRouter();

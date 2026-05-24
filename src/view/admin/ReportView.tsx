@@ -7,7 +7,7 @@ import {
   SprintProgressSection,
   TeamPerformanceTable,
   TeamReportItem,
-} from "@/components/report";
+} from "@/components/features/report";
 
 const TEAM_REPORT_ROWS: TeamReportItem[] = [
   {

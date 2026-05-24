@@ -54,29 +54,31 @@ const MpmsForm = <T extends FieldValues>({
     const errorKeys = Object.keys(errors);
     if (errorKeys.length > 0) {
       const firstErrorKey = errorKeys[0];
-      const firstError = errors[firstErrorKey];
+      if (firstErrorKey) {
+        const firstError = errors[firstErrorKey];
 
-      // If it's a nested error (like skillsRequired.0.skillName)
-      let message = "";
-      if (firstError?.message) {
-        message = firstError.message;
-      } else if (typeof firstError === "object") {
-        // Try to find a message deeper in the object
-        const nestedValues = Object.values(firstError);
-        const nestedErrorWithMessage = nestedValues.find(
-          (v: any) => v?.message,
-        ) as any;
-        if (nestedErrorWithMessage?.message) {
-          message = nestedErrorWithMessage.message;
+        // If it's a nested error (like skillsRequired.0.skillName)
+        let message = "";
+        if (firstError?.message) {
+          message = firstError.message;
+        } else if (typeof firstError === "object") {
+          // Try to find a message deeper in the object
+          const nestedValues = Object.values(firstError);
+          const nestedErrorWithMessage = nestedValues.find(
+            (v: any) => v?.message,
+          ) as any;
+          if (nestedErrorWithMessage?.message) {
+            message = nestedErrorWithMessage.message;
+          }
         }
-      }
 
-      if (message) {
-        toast.error(message);
-      } else {
-        toast.error(
-          `Validation error in ${firstErrorKey}. Please check the form.`,
-        );
+        if (message) {
+          toast.error(message);
+        } else {
+          toast.error(
+            `Validation error in ${firstErrorKey}. Please check the form.`,
+          );
+        }
       }
     } else {
       console.warn("onFormError called but no errors found in errors object.");

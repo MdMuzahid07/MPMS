@@ -1,11 +1,11 @@
 "use client";
 
-import MpmsDatePicker from "@/components/form/MpmsDatePicker";
-import MpmsForm from "@/components/form/MpmsForm";
-import MpmsInput from "@/components/form/MpmsInput";
-import MpmsRadioGroup from "@/components/form/MpmsRadioGroup";
-import MpmsSelect from "@/components/form/MpmsSelect";
-import MpmsTextArea from "@/components/form/MpmsTextArea";
+import MpmsDatePicker from "@/components/features/form/MpmsDatePicker";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
+import MpmsRadioGroup from "@/components/features/form/MpmsRadioGroup";
+import MpmsSelect from "@/components/features/form/MpmsSelect";
+import MpmsTextArea from "@/components/features/form/MpmsTextArea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -181,8 +181,11 @@ function TaskSubtasksField() {
                     checked={subtask.done}
                     onCheckedChange={(checked) => {
                       const updated = [...subtasks];
-                      updated[index] = { ...updated[index], done: !!checked };
-                      setValue("subtasks", updated, { shouldDirty: true });
+                      const subtaskItem = updated[index];
+                      if (subtaskItem) {
+                        updated[index] = { ...subtaskItem, done: !!checked };
+                        setValue("subtasks", updated, { shouldDirty: true });
+                      }
                     }}
                   />
                   <span

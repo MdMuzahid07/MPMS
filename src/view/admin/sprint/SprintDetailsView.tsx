@@ -1,97 +1,74 @@
 "use client";
 
-import { DeleteConfirmationModal } from "@/components/tasks/DeleteConfirmationModal";
+import React from "react";
+import Link from "next/link";
+import { ChevronRight, FilePenLine, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  CalendarDays,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  EllipsisVertical,
-  FilePenLine,
-  Info,
-  ListFilter,
-  Plus,
-  Trash2,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { TaskCanvas } from "@/components/features/tasks";
+import type { TaskItem } from "@/components/features/tasks/task.types";
 
-type TaskItem = {
-  id: string;
-  taskId: string;
-  title: string;
-  assignee: string;
-  priority: "High" | "Medium" | "Low";
-  status: "In Progress" | "Todo" | "Done" | "Blocked";
-  estimate: string;
-  dueDate: string;
-};
-
-const tasks: TaskItem[] = [
+const INITIAL_SPRINT_TASKS = (
+  projectId: string,
+  sprintId: string,
+): TaskItem[] => [
   {
-    id: "CP-102",
-    taskId: "task-102",
-    title: "Refactor Auth Middleware",
-    assignee: "JR",
+    id: "sprint-t1",
+    title: "Refactor Auth Middleware for Session Caching",
+    code: "CP-102",
+    project: "Core Platform",
+    sprint: "Q4.2 Sprint",
+    assignee: "Alex Rivers",
     priority: "High",
-    status: "In Progress",
-    estimate: "5d",
-    dueDate: "Oct 22",
+    status: "Progress",
+    dueDate: "Oct 22, 2023",
+    projectId,
+    sprintId,
+    taskId: "task-102",
   },
   {
-    id: "CP-105",
-    taskId: "task-105",
-    title: "Implement Real-time Sync",
-    assignee: "AK",
+    id: "sprint-t2",
+    title: "Implement Real-time Sync across instances",
+    code: "CP-105",
+    project: "Core Platform",
+    sprint: "Q4.2 Sprint",
+    assignee: "Sarah Chen",
     priority: "Medium",
-    status: "Todo",
-    estimate: "8d",
-    dueDate: "Oct 24",
+    status: "To Do",
+    dueDate: "Oct 24, 2023",
+    projectId,
+    sprintId,
+    taskId: "task-105",
   },
   {
-    id: "CP-92",
-    taskId: "task-092",
-    title: "Design System Audit",
-    assignee: "TH",
+    id: "sprint-t3",
+    title: "Design System Audit & Web Accessibility Review",
+    code: "CP-092",
+    project: "Core Platform",
+    sprint: "Q4.2 Sprint",
+    assignee: "Sarah Chen",
     priority: "Low",
     status: "Done",
-    estimate: "3d",
-    dueDate: "Oct 15",
+    dueDate: "Oct 15, 2023",
+    projectId,
+    sprintId,
+    taskId: "task-092",
   },
   {
-    id: "CP-110",
-    taskId: "task-110",
-    title: "API Documentation Update",
-    assignee: "IZ",
+    id: "sprint-t4",
+    title: "API Documentation Update and Swagger Sync",
+    code: "CP-110",
+    project: "Core Platform",
+    sprint: "Q4.2 Sprint",
+    assignee: "Alex Rivers",
     priority: "Medium",
-    status: "Blocked",
-    estimate: "2d",
-    dueDate: "Oct 20",
+    status: "Review",
+    dueDate: "Oct 20, 2023",
+    projectId,
+    sprintId,
+    taskId: "task-110",
   },
 ];
-
-const priorityStyles: Record<TaskItem["priority"], string> = {
-  High: "text-rose-500",
-  Medium: "text-amber-500",
-  Low: "text-emerald-500",
-};
-
-const statusStyles: Record<TaskItem["status"], string> = {
-  "In Progress":
-    "border-indigo-500/25 bg-indigo-500/12 text-indigo-700 dark:text-indigo-300",
-  Todo: "border-slate-500/20 bg-slate-500/12 text-slate-700 dark:text-slate-300",
-  Done: "border-emerald-500/25 bg-emerald-500/12 text-emerald-700 dark:text-emerald-300",
-  Blocked: "border-rose-500/25 bg-rose-500/12 text-rose-700 dark:text-rose-300",
-};
 
 function StatCard({
   title,
@@ -99,7 +76,7 @@ function StatCard({
   subtitleLeft,
   subtitleRight,
   bar,
-  accentClass = "bg-slate-900 dark:bg-indigo-300",
+  accentClass = "bg-primary",
 }: {
   title: string;
   value: string;
@@ -109,20 +86,20 @@ function StatCard({
   accentClass?: string;
 }) {
   return (
-    <article className="bg-card border-border rounded-none border p-4">
+    <article className="border-border/60 rounded-xl border bg-[#111118] p-5 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-muted-foreground text-[11px] font-semibold">
+        <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
           {title}
         </p>
-        <p className="text-xl font-semibold">{value}</p>
+        <p className="text-xl font-bold">{value}</p>
       </div>
-      <div className="bg-muted h-1.5 rounded-none">
+      <div className="h-1.5 overflow-hidden rounded-full bg-[#1b1b23]">
         <div
-          className={`h-1.5 rounded-none ${accentClass}`}
+          className={`h-full ${accentClass} transition-all duration-300`}
           style={{ width: `${bar}%` }}
         />
       </div>
-      <div className="text-muted-foreground mt-3 flex items-center justify-between text-[11px]">
+      <div className="text-muted-foreground mt-3 flex items-center justify-between text-[10px] font-semibold tracking-wider uppercase">
         <span>{subtitleLeft}</span>
         <span>{subtitleRight}</span>
       </div>
@@ -138,35 +115,33 @@ type SprintDetailPageProps = {
 };
 
 export default function SprintDetailView({ params }: SprintDetailPageProps) {
-  const [taskRows, setTaskRows] = useState(tasks);
-  const [taskPendingDelete, setTaskPendingDelete] = useState<TaskItem | null>(
-    null,
-  );
-
-  const handleDeleteTask = (taskId: string) => {
-    setTaskRows((prev) => prev.filter((task) => task.id !== taskId));
-  };
+  const { id, sprintId } = params;
 
   return (
-    <div className="container mx-auto w-full space-y-4 pb-8">
+    <div className="animate-in fade-in w-full space-y-6 pb-8 duration-300">
+      {/* Breadcrumb & Navigation */}
       <section className="space-y-3">
-        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+        <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
           <span>Projects</span>
           <ChevronRight className="size-3" />
           <span>Core Platform</span>
         </div>
 
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
           <div>
-            <h1 className="text-4xl font-semibold tracking-tight">
+            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
               Q4.2 - Core Features
             </h1>
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs">
-              <Badge className="h-6 rounded-none border-0 bg-emerald-500/15 px-2 font-semibold text-emerald-600 dark:text-emerald-300">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+              <Badge className="border-success/20 bg-success/10 text-success h-6 rounded-full border px-2.5 text-[10px] font-bold">
                 Active Sprint
               </Badge>
-              <span className="text-muted-foreground">Oct 12 - Oct 26</span>
-              <span className="text-muted-foreground">12 Team Members</span>
+              <span className="text-muted-foreground font-medium">
+                Oct 12 - Oct 26
+              </span>
+              <span className="text-muted-foreground font-medium">
+                • 12 Team Members
+              </span>
             </div>
           </div>
 
@@ -174,23 +149,19 @@ export default function SprintDetailView({ params }: SprintDetailPageProps) {
             <Button
               asChild
               variant="outline"
-              className="h-9 rounded-none px-4 text-xs font-semibold"
+              className="border-border h-9 rounded-lg px-3.5 text-xs font-semibold hover:bg-[#1b1b23]"
             >
-              <Link
-                href={`/projects/${params.id}/sprints/${params.sprintId}/edit`}
-              >
-                <FilePenLine className="mr-1 size-3.5" />
+              <Link href={`/projects/${id}/sprints/${sprintId}/edit`}>
+                <FilePenLine className="mr-1.5 size-3.5" />
                 Edit Sprint
               </Link>
             </Button>
             <Button
               asChild
-              className="h-9 rounded-none px-4 text-xs font-semibold"
+              className="h-9 rounded-lg px-3.5 text-xs font-semibold"
             >
-              <Link
-                href={`/projects/${params.id}/sprints/${params.sprintId}/tasks/new`}
-              >
-                <Plus className="mr-1 size-3.5" />
+              <Link href={`/projects/${id}/sprints/${sprintId}/tasks/new`}>
+                <Plus className="mr-1.5 size-3.5" />
                 Add Task
               </Link>
             </Button>
@@ -198,7 +169,8 @@ export default function SprintDetailView({ params }: SprintDetailPageProps) {
         </div>
       </section>
 
-      <section className="grid gap-3 lg:grid-cols-3">
+      {/* KPI Stats Widgets */}
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Overall Completion"
           value="64%"
@@ -212,218 +184,37 @@ export default function SprintDetailView({ params }: SprintDetailPageProps) {
           subtitleLeft=""
           subtitleRight=""
           bar={72}
-          accentClass="bg-lime-500"
+          accentClass="bg-warning"
         />
-        <article className="bg-card border-border rounded-none border p-4">
-          <p className="text-muted-foreground text-[11px] font-semibold">
+        <article className="border-border/60 rounded-xl border bg-[#111118] p-5 shadow-sm">
+          <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
             Blockers
           </p>
-          <div className="mt-3 flex items-end gap-3">
-            <span className="text-4xl font-semibold text-rose-500">2</span>
-            <span className="text-muted-foreground pb-1 text-xs font-semibold">
-              CRITICAL
+          <div className="mt-3 flex items-end gap-2">
+            <span className="text-destructive text-3xl font-extrabold">2</span>
+            <span className="text-muted-foreground pb-0.5 text-[10px] font-bold tracking-wider uppercase">
+              CRITICAL BLOCKERS
             </span>
           </div>
-          <div className="mt-4 flex -space-x-1">
-            <span className="bg-primary text-primary-foreground inline-flex size-6 items-center justify-center rounded-full text-[10px] font-semibold">
+          <div className="mt-4 flex -space-x-1.5">
+            <span className="bg-primary/20 text-primary border-primary/30 inline-flex size-6 items-center justify-center rounded-full border text-[9px] font-bold tracking-wider">
               JR
             </span>
-            <span className="inline-flex size-6 items-center justify-center rounded-full bg-slate-700 text-[10px] font-semibold text-white">
+            <span className="inline-flex size-6 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20 text-[9px] font-bold tracking-wider text-amber-500">
               AK
             </span>
           </div>
         </article>
       </section>
 
-      <section className="bg-card border-border rounded-none border">
-        <div className="border-border flex flex-wrap items-center justify-between gap-3 border-b p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              className="rounded-none px-3 text-[11px] font-semibold"
-            >
-              All Tasks
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-none px-3 text-[11px] font-semibold"
-            >
-              Assigned to me
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-none px-3 text-[11px] font-semibold"
-            >
-              High Priority
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-none px-3 text-[11px] font-semibold"
-            >
-              Missing Estimate
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-none px-2 text-[11px] font-semibold"
-            >
-              <ListFilter className="mr-1 size-3.5" />
-              Filter
-              <ChevronDown className="ml-1 size-3" />
-            </Button>
-            <Button variant="outline" size="icon-sm" className="rounded-none">
-              <Users className="size-3.5" />
-            </Button>
-            <Button variant="outline" size="icon-sm" className="rounded-none">
-              <CalendarDays className="size-3.5" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[880px] border-collapse">
-            <thead className="bg-muted/40">
-              <tr className="border-border border-b text-left">
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  TITLE
-                </th>
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  ASSIGNEE
-                </th>
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  PRIORITY
-                </th>
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  STATUS
-                </th>
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  ESTIMATE
-                </th>
-                <th className="px-4 py-3 text-[11px] font-semibold tracking-wide">
-                  DUE DATE
-                </th>
-                <th className="w-12 px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {taskRows.map((task) => (
-                <tr key={task.id} className="border-border border-b">
-                  <td className="px-4 py-3.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-xs font-semibold">
-                        {task.id}
-                      </span>
-                      <span className="text-sm font-medium">{task.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className="bg-muted text-muted-foreground inline-flex size-6 items-center justify-center rounded-full text-[10px] font-semibold">
-                      {task.assignee}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-medium ${priorityStyles[task.priority]}`}
-                    >
-                      <span className="size-1.5 rounded-full bg-current" />
-                      {task.priority}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <Badge
-                      variant="outline"
-                      className={`h-6 rounded-full border px-2 text-[10px] font-semibold ${statusStyles[task.status]}`}
-                    >
-                      {task.status}
-                    </Badge>
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3.5 text-sm">
-                    {task.estimate}
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3.5 text-sm">
-                    {task.dueDate}
-                  </td>
-                  <td className="px-4 py-3.5 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon-xs">
-                          <EllipsisVertical className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-36">
-                        <DropdownMenuItem asChild>
-                          <Link
-                            href={`/projects/${params.id}/sprints/${params.sprintId}/tasks/${task.taskId}?mode=details`}
-                          >
-                            <Info className="size-3.5" />
-                            Details
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link
-                            href={`/projects/${params.id}/sprints/${params.sprintId}/tasks/${task.taskId}`}
-                          >
-                            <FilePenLine className="size-3.5" />
-                            Edit
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onSelect={() => setTaskPendingDelete(task)}
-                        >
-                          <Trash2 className="size-3.5" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex items-center justify-between p-3">
-          <p className="text-muted-foreground text-xs">
-            Showing 1-{taskRows.length} of {taskRows.length} tasks
-          </p>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon-sm" className="rounded-none">
-              <ChevronLeft className="size-3.5" />
-            </Button>
-            <Button size="icon-sm" className="rounded-none">
-              1
-            </Button>
-            <Button variant="ghost" size="icon-sm" className="rounded-none">
-              2
-            </Button>
-            <Button variant="ghost" size="icon-sm" className="rounded-none">
-              <ChevronRight className="size-3.5" />
-            </Button>
-          </div>
-        </div>
+      {/* Shareable TaskCanvas dual view switcher */}
+      <section>
+        <TaskCanvas
+          initialTasks={INITIAL_SPRINT_TASKS(id, sprintId)}
+          title="Sprint Work Canvas"
+          subtitle="Toggle views to track sprint items and update priorities."
+        />
       </section>
-
-      <DeleteConfirmationModal
-        open={Boolean(taskPendingDelete)}
-        onOpenChange={(open) => {
-          if (!open) setTaskPendingDelete(null);
-        }}
-        title="Delete task?"
-        description={`This will permanently delete "${taskPendingDelete?.title ?? "this task"}".`}
-        confirmLabel="Delete"
-        onConfirm={() => {
-          if (!taskPendingDelete) return;
-          handleDeleteTask(taskPendingDelete.id);
-          setTaskPendingDelete(null);
-        }}
-      />
     </div>
   );
 }

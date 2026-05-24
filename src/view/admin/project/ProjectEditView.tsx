@@ -1,4 +1,4 @@
-import { ProjectEditForm } from "@/components/projects/ProjectEditForm";
+import { ProjectEditForm } from "@/components/features/projects/ProjectEditForm";
 
 type EditProjectPageProps = {
   params: { id: string };

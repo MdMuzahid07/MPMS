@@ -76,6 +76,12 @@ export function TaskEditForm({
 }: TaskEditFormProps) {
   const [draft, setDraft] = useState<TaskEditDraft>(() => createDraft(task));
 
+  const [prevTask, setPrevTask] = useState<TaskItem | null>(null);
+  if (task !== prevTask) {
+    setPrevTask(task);
+    setDraft(createDraft(task));
+  }
+
   const handleSave = () => {
     if (!task) return;
 

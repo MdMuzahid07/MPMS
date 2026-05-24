@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteConfirmationModal } from "@/components/tasks/DeleteConfirmationModal";
+import { DeleteConfirmationModal } from "@/components/features/tasks/DeleteConfirmationModal";
 import {
   TeamHeader,
   TeamMember,
@@ -8,7 +8,7 @@ import {
   TeamStatCard,
   TeamTable,
   TeamTableFooter,
-} from "@/components/team";
+} from "@/components/features/team";
 import { BrainCircuit, Rocket, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 

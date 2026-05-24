@@ -1,9 +1,9 @@
 "use client";
 
-import MpmsDatePicker from "@/components/form/MpmsDatePicker";
-import MpmsForm from "@/components/form/MpmsForm";
-import MpmsInput from "@/components/form/MpmsInput";
-import MpmsTextArea from "@/components/form/MpmsTextArea";
+import MpmsDatePicker from "@/components/features/form/MpmsDatePicker";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
+import MpmsTextArea from "@/components/features/form/MpmsTextArea";
 import { Button } from "@/components/ui/button";
 import { Flag, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";

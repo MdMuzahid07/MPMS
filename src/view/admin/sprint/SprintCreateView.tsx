@@ -1,4 +1,4 @@
-import { SprintUpsertForm } from "@/components/projects/SprintUpsertForm";
+import { SprintUpsertForm } from "@/components/features/projects/SprintUpsertForm";
 
 type SprintCreatePageProps = {
   params: { id: string };
