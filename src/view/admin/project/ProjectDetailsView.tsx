@@ -1,67 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  useGetProjectByIdQuery,
+  useGetProjectStatsQuery,
+} from "@/redux/feature/projects/projectsApi";
+import { useGetSprintsQuery } from "@/redux/feature/sprints/sprintsApi";
+import type { Sprint, SprintStatus } from "@/types/domain.types";
+import { format } from "date-fns";
 import {
   CalendarDays,
   CircleDashed,
   FilePenLine,
+  Loader2,
   Plus,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-
-type SprintStatus = "IN PROGRESS" | "PLANNING" | "COMPLETED";
-
-type Sprint = {
-  id: string;
-  slug: string;
-  title: string;
-  status: SprintStatus;
-  dateRange: string;
-  metricLabel: string;
-  metricValue: string;
-  progress: number;
-  accent: "default" | "success";
-  cta: string;
-};
-
-const sprintData: Sprint[] = [
-  {
-    id: "Sprint #08",
-    slug: "sprint-08",
-    title: "Infrastructure Hardening",
-    status: "IN PROGRESS",
-    dateRange: "May 12 — May 26, 2024",
-    metricLabel: "Tasks Completed",
-    metricValue: "18 / 24",
-    progress: 75,
-    accent: "default",
-    cta: "View Sprint Details",
-  },
-  {
-    id: "Sprint #09",
-    slug: "sprint-09",
-    title: "User Experience Refinement",
-    status: "PLANNING",
-    dateRange: "May 27 — Jun 10, 2024",
-    metricLabel: "Scope Defined",
-    metricValue: "42%",
-    progress: 42,
-    accent: "default",
-    cta: "View Backlog",
-  },
-  {
-    id: "Sprint #07",
-    slug: "sprint-07",
-    title: "Core API Integration",
-    status: "COMPLETED",
-    dateRange: "Apr 28 — May 11, 2024",
-    metricLabel: "Goal Achieved",
-    metricValue: "100%",
-    progress: 100,
-    accent: "success",
-    cta: "View Retrospective",
-  },
-];
 
 const velocityBySprint = [
   { label: "S04", value: 32 },
@@ -72,11 +27,11 @@ const velocityBySprint = [
 ];
 
 function statusBadgeStyle(status: SprintStatus) {
-  if (status === "COMPLETED") {
+  if (status === "completed") {
     return "border-emerald-500/20 bg-emerald-500/12 text-emerald-600 dark:text-emerald-400";
   }
 
-  if (status === "IN PROGRESS") {
+  if (status === "active") {
     return "border-indigo-500/25 bg-indigo-500/12 text-indigo-700 dark:text-indigo-300";
   }
 
@@ -91,16 +46,26 @@ function SprintItemCard({
   sprint: Sprint;
 }) {
   const progressClass =
-    sprint.accent === "success"
+    sprint.status === "completed"
       ? "bg-emerald-500"
       : "bg-slate-900 dark:bg-indigo-200";
+
+  const dateRange =
+    sprint.startDate && sprint.endDate
+      ? `${format(new Date(sprint.startDate), "MMM d")} — ${format(new Date(sprint.endDate), "MMM d, yyyy")}`
+      : "Dates TBD";
+
+  // Note: progress calculation will be fully dynamic once tasks are bound to sprints.
+  // Using a fallback for now.
+  const progress =
+    sprint.status === "completed" ? 100 : sprint.status === "active" ? 50 : 0;
 
   return (
     <article className="bg-card border-border rounded-lg border p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <p className="text-muted-foreground text-[11px] font-semibold tracking-wide">
-            {sprint.id}
+            Sprint #{sprint.sprintNumber}
           </p>
           <h3 className="mt-1 text-lg leading-tight font-semibold">
             {sprint.title}
@@ -108,7 +73,7 @@ function SprintItemCard({
         </div>
         <Badge
           variant="outline"
-          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide ${statusBadgeStyle(
+          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${statusBadgeStyle(
             sprint.status,
           )}`}
         >
@@ -119,17 +84,17 @@ function SprintItemCard({
 
       <div className="text-muted-foreground mb-5 flex items-center gap-1.5 text-xs">
         <CalendarDays className="size-3.5" />
-        <span>{sprint.dateRange}</span>
+        <span>{dateRange}</span>
       </div>
 
       <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">{sprint.metricLabel}</span>
-        <span className="font-semibold">{sprint.metricValue}</span>
+        <span className="text-muted-foreground">Progress</span>
+        <span className="font-semibold">{progress}%</span>
       </div>
       <div className="bg-muted h-1.5 w-full rounded-full">
         <div
           className={`h-1.5 rounded-full ${progressClass}`}
-          style={{ width: `${sprint.progress}%` }}
+          style={{ width: `${progress}%` }}
         />
       </div>
 
@@ -138,8 +103,8 @@ function SprintItemCard({
         variant="outline"
         className="mt-5 h-8 w-full rounded-md text-xs font-semibold"
       >
-        <Link href={`/projects/${projectId}/sprints/${sprint.slug}`}>
-          {sprint.cta}
+        <Link href={`/projects/${projectId}/sprints/${sprint._id}`}>
+          View Sprint Details
         </Link>
       </Button>
 
@@ -148,7 +113,7 @@ function SprintItemCard({
         variant="ghost"
         className="text-muted-foreground mt-1 h-8 w-full rounded-md text-xs font-semibold"
       >
-        <Link href={`/projects/${projectId}/sprints/${sprint.slug}/edit`}>
+        <Link href={`/projects/${projectId}/sprints/${sprint._id}/edit`}>
           <FilePenLine className="mr-1 size-3.5" />
           Edit Sprint
         </Link>
@@ -158,43 +123,78 @@ function SprintItemCard({
 }
 
 type ProjectDetailPageProps = {
-  params: { id: string };
+  id: string;
 };
 
-export default function ProjectDetailsView({ params }: ProjectDetailPageProps) {
-  const { id: projectId } = params;
+export default function ProjectDetailsView({
+  id: projectId,
+}: ProjectDetailPageProps) {
+  const { data: project, isLoading: isProjectLoading } =
+    useGetProjectByIdQuery(projectId);
+  const { data: stats, isLoading: isStatsLoading } =
+    useGetProjectStatsQuery(projectId);
+  const { data: sprintDataRaw, isLoading: isSprintsLoading } =
+    useGetSprintsQuery(projectId);
+
+  // We should unwrap nested data if backend returns { success, data: Sprint[] } without transformResponse
+  const sprints = Array.isArray(sprintDataRaw)
+    ? sprintDataRaw
+    : (sprintDataRaw as any)?.data || [];
+
   const peakVelocity = Math.max(...velocityBySprint.map((item) => item.value));
+
+  if (isProjectLoading || isStatsLoading || isSprintsLoading || !project) {
+    return (
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const projectIdShort = project._id.slice(-6).toUpperCase();
 
   return (
     <div className="relative container mx-auto w-full space-y-4 pb-8">
       <section className="bg-card border-border rounded-xl border p-6 dark:bg-[linear-gradient(110deg,var(--color-card)_40%,rgba(82,100,255,0.10)_100%)]">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <Badge className="rounded-full border-0 bg-emerald-500/16 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-            ACTIVE
+          <Badge className="rounded-full border-0 bg-emerald-500/16 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 uppercase dark:text-emerald-400">
+            {project.status}
           </Badge>
           <span className="text-muted-foreground text-xs font-medium">
-            ID: NC-4902
+            ID: {projectIdShort}
           </span>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr]">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">
-              Nebula Core
+              {project.title}
             </h1>
 
             <div className="mt-6 grid grid-cols-2 gap-6">
               <div>
-                <p className="text-muted-foreground text-[11px] font-medium">
+                <p className="text-muted-foreground text-[11px] font-medium uppercase">
                   Budget Allocation
                 </p>
-                <p className="mt-1 text-2xl font-semibold">$428,000.00</p>
+                <p className="mt-1 text-2xl font-semibold">
+                  $
+                  {project.budget
+                    ? project.budget.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : "0.00"}
+                </p>
               </div>
               <div>
-                <p className="text-muted-foreground text-[11px] font-medium">
+                <p className="text-muted-foreground text-[11px] font-medium uppercase">
                   Estimated Completion
                 </p>
-                <p className="mt-1 text-2xl font-semibold">Oct 2024</p>
+                <p className="mt-1 text-2xl font-semibold">
+                  {project.endDate
+                    ? format(new Date(project.endDate), "MMM yyyy")
+                    : "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -203,17 +203,22 @@ export default function ProjectDetailsView({ params }: ProjectDetailPageProps) {
             <div className="w-full">
               <div className="mb-2 flex items-end justify-between">
                 <div>
-                  <p className="text-muted-foreground text-[11px] font-medium">
+                  <p className="text-muted-foreground text-[11px] font-medium uppercase">
                     Overall Completion
                   </p>
-                  <p className="text-xl font-semibold">68%</p>
+                  <p className="text-xl font-semibold">
+                    {stats?.percentComplete ?? 0}%
+                  </p>
                 </div>
                 <p className="text-muted-foreground text-xs font-medium">
-                  Next Milestone: v2.0 Beta
+                  Tasks: {stats?.completedTasks ?? 0}/{stats?.totalTasks ?? 0}
                 </p>
               </div>
               <div className="bg-muted h-2 w-full rounded-full">
-                <div className="bg-primary h-2 w-[68%] rounded-full" />
+                <div
+                  className="bg-primary h-2 rounded-full"
+                  style={{ width: `${stats?.percentComplete ?? 0}%` }}
+                />
               </div>
             </div>
           </div>
@@ -231,13 +236,20 @@ export default function ProjectDetailsView({ params }: ProjectDetailPageProps) {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        {sprintData.map((sprint) => (
-          <SprintItemCard
-            key={sprint.id}
-            projectId={projectId}
-            sprint={sprint}
-          />
-        ))}
+        {sprints.length === 0 ? (
+          <div className="border-border/60 bg-card/20 text-muted-foreground col-span-full flex h-32 flex-col items-center justify-center rounded-xl border border-dashed text-center">
+            <CircleDashed className="mb-2 size-6 opacity-20" />
+            <p className="text-sm font-medium">No sprints planned yet</p>
+          </div>
+        ) : (
+          sprints.map((sprint: Sprint) => (
+            <SprintItemCard
+              key={sprint._id}
+              projectId={projectId}
+              sprint={sprint}
+            />
+          ))
+        )}
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_1.2fr_0.72fr]">

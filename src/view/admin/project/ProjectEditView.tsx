@@ -1,12 +1,10 @@
 import { ProjectEditForm } from "@/components/features/projects/ProjectEditForm";
 
 type EditProjectPageProps = {
-  params: { id: string };
+  id: string;
 };
 
-export default function ProjectEditView({ params }: EditProjectPageProps) {
-  const { id } = params;
-
+export default function ProjectEditView({ id }: EditProjectPageProps) {
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-2">

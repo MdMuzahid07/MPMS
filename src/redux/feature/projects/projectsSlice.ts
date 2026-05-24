@@ -1,34 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Project } from "@/types/domain";
-import { mockData } from "@/data/mockData";
 
 interface ProjectsState {
-  projects: Project[];
+  selectedId: string | null;
+  filters: Record<string, string>;
 }
 
 const initialState: ProjectsState = {
-  projects: mockData.getProjects(),
+  selectedId: null,
+  filters: {},
 };
 
-const projectsSlice = createSlice({
+export const projectsSlice = createSlice({
   name: "projects",
   initialState,
   reducers: {
-    setProjects: (state, action: PayloadAction<Project[]>) => {
-      state.projects = action.payload;
+    setSelectedProject: (state, action: PayloadAction<string>) => {
+      state.selectedId = action.payload;
     },
-    updateProjectProgress: (
-      state,
-      action: PayloadAction<{ id: string; progress: number }>,
-    ) => {
-      const { id, progress } = action.payload;
-      const project = state.projects.find((p) => p.id === id);
-      if (project) {
-        project.progress = progress;
-      }
+    setFilters: (state, action: PayloadAction<Record<string, string>>) => {
+      state.filters = action.payload;
     },
+    resetProjectsState: () => initialState,
   },
 });
 
-export const { setProjects, updateProjectProgress } = projectsSlice.actions;
+export const { setSelectedProject, setFilters, resetProjectsState } =
+  projectsSlice.actions;
 export default projectsSlice.reducer;

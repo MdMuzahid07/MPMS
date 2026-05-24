@@ -1,13 +1,14 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Project } from "@/types/domain";
+import { Project } from "@/types/domain.types";
 
-const getStatusStyles = (status: Project["status"]) => {
-  switch (status) {
-    case "Active":
+const getStatusStyles = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "active":
       return "bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
-    case "At Risk":
+    case "at risk":
+    case "archived":
       return "bg-amber-500/10 border-amber-500/20 text-amber-400";
     default:
       return "bg-primary/10 border-primary/20 text-primary";
@@ -15,14 +16,24 @@ const getStatusStyles = (status: Project["status"]) => {
 };
 
 interface ProjectCardProps {
-  project: Omit<Project, "icon"> & { icon?: React.ReactNode };
+  project: Omit<Project, "icon"> & {
+    icon?: React.ReactNode;
+    id?: string;
+    name?: string;
+    progress?: number;
+    progressColor?: string;
+  };
   onClick?: (projectId: string) => void;
 }
 
 export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
+  const projectId = project._id || project.id || "";
+  const projectTitle = project.title || project.name || "";
+  const progress = project.progress !== undefined ? project.progress : 0;
+
   return (
     <div
-      onClick={() => onClick?.(project.id)}
+      onClick={() => onClick?.(projectId)}
       className="bg-card border-border hover:border-primary/40 group flex cursor-pointer flex-col justify-between rounded-lg border p-6 shadow-xs transition-all duration-200"
     >
       <div>
@@ -43,7 +54,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
           </div>
         </div>
         <h3 className="text-foreground group-hover:text-primary line-clamp-1 text-lg font-semibold transition-colors">
-          {project.name}
+          {projectTitle}
         </h3>
         <p className="text-muted-foreground mt-2 mb-6 line-clamp-2 text-sm leading-relaxed">
           {project.description}
@@ -52,7 +63,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
       <div className="mt-auto space-y-2">
         <div className="text-muted-foreground flex justify-between text-xs font-medium">
           <span>Progress</span>
-          <span className="text-foreground">{project.progress}%</span>
+          <span className="text-foreground">{progress}%</span>
         </div>
         <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
           <div
@@ -60,7 +71,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
               "h-full rounded-full",
               project.progressColor || "bg-primary",
             )}
-            style={{ width: `${project.progress}%` }}
+            style={{ width: `${progress}%` }}
           />
         </div>
       </div>

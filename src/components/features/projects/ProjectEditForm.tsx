@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import MpmsDatePicker from "@/components/features/form/MpmsDatePicker";
@@ -6,59 +7,20 @@ import MpmsInput from "@/components/features/form/MpmsInput";
 import MpmsSelect from "@/components/features/form/MpmsSelect";
 import MpmsTextArea from "@/components/features/form/MpmsTextArea";
 import { Button } from "@/components/ui/button";
-import { CloudUpload, Info } from "lucide-react";
+import { handleApiError } from "@/lib/handleApiError";
+import {
+  useGetProjectByIdQuery,
+  useUpdateProjectMutation,
+} from "@/redux/feature/projects/projectsApi";
+import { useUploadImageMutation } from "@/redux/feature/upload/uploadApi";
+import { UpdateProjectDto, updateProjectSchema } from "@/types/projects.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CloudUpload, Info, Loader2, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-type ProjectFormValues = {
-  title: string;
-  client: string;
-  description: string;
-  budget: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-};
-
-const PROJECT_FORM_SEED: Record<string, ProjectFormValues> = {
-  "proj-1": {
-    title: "Nexus HQ Expansion",
-    client: "NexaCorp Industries",
-    description:
-      "Expand HQ network and deploy a resilient infrastructure layer.",
-    budget: "428000",
-    status: "Active",
-    startDate: "2024-10-12",
-    endDate: "2024-12-24",
-  },
-  "proj-2": {
-    title: "Infra Cloud Sync",
-    client: "DataStream Systems",
-    description: "Stabilize cloud sync operations and improve fault recovery.",
-    budget: "240000",
-    status: "On Hold",
-    startDate: "2024-09-05",
-    endDate: "2025-01-15",
-  },
-  "proj-3": {
-    title: "Neural Core v2",
-    client: "BioTech Neural",
-    description: "Ship v2 core module with upgraded compute and observability.",
-    budget: "310000",
-    status: "Completed",
-    startDate: "2024-08-01",
-    endDate: "2024-10-30",
-  },
-  "proj-4": {
-    title: "Core Design System",
-    client: "Internal Product",
-    description: "Unify product UI components and documentation standards.",
-    budget: "120000",
-    status: "Planning",
-    startDate: "2024-10-20",
-    endDate: "2025-02-10",
-  },
-};
 
 type ProjectEditFormProps = {
   projectId: string;
@@ -66,25 +28,138 @@ type ProjectEditFormProps = {
 
 export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
   const router = useRouter();
-  const seed = PROJECT_FORM_SEED[projectId] ?? {
-    title: "Untitled Project",
-    client: "",
-    description: "",
-    budget: "",
-    status: "Planning",
-    startDate: "",
-    endDate: "",
+  const { data: project, isLoading: isProjectLoading } =
+    useGetProjectByIdQuery(projectId);
+  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
+  const [isThumbnailEdited, setIsThumbnailEdited] = useState(false);
+
+  const currentThumbnailUrl = isThumbnailEdited
+    ? thumbnailUrl
+    : project?.thumbnail || "";
+
+  // Format dates for input type="date"
+  const defaultStartDate = project?.startDate
+    ? new Date(project.startDate).toISOString().split("T")[0]
+    : "";
+  const defaultEndDate = project?.endDate
+    ? new Date(project.endDate).toISOString().split("T")[0]
+    : "";
+
+  const defaultValues: Partial<UpdateProjectDto> = {
+    title: project?.title || "",
+    client: project?.client || "",
+    description: project?.description || "",
+    budget: project?.budget || "",
+    status: project?.status || "planned",
+    startDate: defaultStartDate,
+    endDate: defaultEndDate,
   };
 
-  const onSubmit = (data: ProjectFormValues) => {
-    console.log("Project update payload:", { projectId, ...data });
-    toast.success("Project updated successfully.");
-    router.push("/projects");
+  const methods = useForm<UpdateProjectDto>({
+    resolver: zodResolver(updateProjectSchema),
+    defaultValues,
+  });
+
+  // Reset values when project is loaded
+  useEffect(() => {
+    if (project) {
+      methods.reset({
+        title: project.title,
+        client: project.client,
+        description: project.description,
+        budget: project.budget,
+        status: project.status,
+        startDate: defaultStartDate,
+        endDate: defaultEndDate,
+      });
+    }
+  }, [project, methods, defaultStartDate, defaultEndDate]);
+
+  if (isProjectLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!project) {
+    return <div>Project not found.</div>;
+  }
+
+  const onSubmit = async (data: UpdateProjectDto) => {
+    try {
+      const projectData = {
+        ...(data.title && { title: data.title }),
+        ...(data.client && { client: data.client }),
+        ...(data.description && { description: data.description }),
+        ...(data.budget !== undefined && { budget: Number(data.budget) }),
+        ...(data.status && { status: data.status }),
+        ...(data.startDate && {
+          startDate: new Date(data.startDate).toISOString(),
+        }),
+        ...(data.endDate && { endDate: new Date(data.endDate).toISOString() }),
+        thumbnail: currentThumbnailUrl, // set whatever url is current (can be empty string if removed)
+      };
+
+      await updateProject({ id: projectId, data: projectData }).unwrap();
+      toast.success("Project updated successfully.");
+      router.push("/projects");
+    } catch (error: any) {
+      if (error && error.status === 400) {
+        const errorSources = error.data?.errorSources;
+        if (Array.isArray(errorSources)) {
+          errorSources.forEach((src: any) => {
+            if (src.path) {
+              methods.setError(src.path as any, {
+                type: "server",
+                message: src.message,
+              });
+            } else {
+              toast.error(src.message);
+            }
+          });
+        } else {
+          toast.error(error.data?.message || "Invalid input details.");
+        }
+      } else {
+        handleApiError(error);
+      }
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const uploadResult = await uploadImage(formData).unwrap();
+      const secureUrl =
+        (uploadResult as any).data?.secure_url ||
+        (uploadResult as any).secure_url;
+      setThumbnailUrl(secureUrl);
+      setIsThumbnailEdited(true);
+      toast.success("Image uploaded successfully!");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      toast.error("Failed to upload image.");
+    }
+  };
+
+  const removeThumbnail = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setThumbnailUrl("");
+    setIsThumbnailEdited(true);
   };
 
   return (
-    <MpmsForm<ProjectFormValues> defaultValues={seed} onSubmit={onSubmit}>
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+    <MpmsForm<UpdateProjectDto> onSubmit={onSubmit} methods={methods}>
+      <div className="mt-6 grid w-full gap-6 overflow-hidden lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <section className="border-border/60 bg-card rounded-xl border p-5 shadow-sm">
             <h2 className="mb-5 text-lg font-semibold tracking-tight">
@@ -121,10 +196,10 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
                   label="Status"
                   required
                   options={[
-                    { value: "Planning", label: "Planning" },
-                    { value: "Active", label: "Active" },
-                    { value: "On Hold", label: "On Hold" },
-                    { value: "Completed", label: "Completed" },
+                    { value: "planned", label: "Planning" },
+                    { value: "active", label: "Active" },
+                    { value: "archived", label: "On Hold" },
+                    { value: "completed", label: "Completed" },
                   ]}
                 />
               </div>
@@ -155,20 +230,53 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 Thumbnail
               </span>
-              <button
-                type="button"
-                className="border-border bg-background/40 hover:bg-muted/50 flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-colors"
-              >
-                <span className="bg-primary/12 text-primary mb-3 rounded-full p-3">
-                  <CloudUpload className="size-6" />
-                </span>
-                <span className="text-sm font-medium">
-                  Click to upload or drag and drop
-                </span>
-                <span className="text-muted-foreground mt-1 text-[10px] uppercase">
-                  SVG, PNG, JPG or GIF (max. 800x400px)
-                </span>
-              </button>
+              <div className="border-border/80 bg-background/50 hover:bg-muted/50 relative flex min-h-40 flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed p-6 text-center transition-colors">
+                {isUploading ? (
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                    <p className="text-muted-foreground text-xs">
+                      Uploading image...
+                    </p>
+                  </div>
+                ) : currentThumbnailUrl ? (
+                  <div className="group relative h-full min-h-30 w-full overflow-hidden rounded-md">
+                    <Image
+                      src={thumbnailUrl}
+                      alt="Thumbnail Preview"
+                      width={500}
+                      height={128}
+                      className="h-32 w-full rounded-md object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={removeThumbnail}
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full p-2 shadow-sm transition-transform hover:scale-105"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
+                      onChange={handleFileChange}
+                    />
+                    <div className="bg-primary/10 text-primary mb-3 rounded-full p-3">
+                      <CloudUpload className="size-6" />
+                    </div>
+                    <span className="text-sm font-medium">
+                      Click to upload or drag and drop
+                    </span>
+                    <span className="text-muted-foreground mt-1 text-[10px] uppercase">
+                      SVG, PNG, JPG or GIF (max. 800x400px)
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </section>
 
@@ -191,7 +299,12 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
         >
           Cancel
         </Button>
-        <Button type="submit" className="w-full px-6 sm:w-auto">
+        <Button
+          type="submit"
+          disabled={isUpdating || isUploading}
+          className="w-full px-6 sm:w-auto"
+        >
+          {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Changes
         </Button>
       </div>

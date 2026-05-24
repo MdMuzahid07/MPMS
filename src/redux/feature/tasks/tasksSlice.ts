@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Task, Comment, ActivityLog, TaskStatus } from "@/types/domain";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { mockData } from "@/data/mockData";
+import { ActivityLog, Task, TaskStatus } from "@/types/domain.types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface TasksState {
   tasksBySprint: Record<string, Task[]>;
@@ -39,13 +40,13 @@ const tasksSlice = createSlice({
       const { sprintId, taskId, status, user } = action.payload;
       const list = state.tasksBySprint[sprintId];
       if (list) {
-        const task = list.find((t) => t.id === taskId);
+        const task = list.find((t: any) => (t.id || t._id) === taskId);
         if (task) {
           const oldStatus = task.status;
           task.status = status;
 
           // Append to Activity Logs
-          const newLog: ActivityLog = {
+          const newLog: any = {
             id: `log-${Date.now()}`,
             user,
             action: `changed status from ${oldStatus} to ${status}`,
@@ -69,9 +70,9 @@ const tasksSlice = createSlice({
       const { sprintId, taskId, content, author, avatar } = action.payload;
       const list = state.tasksBySprint[sprintId];
       if (list) {
-        const task = list.find((t) => t.id === taskId);
+        const task = list.find((t: any) => (t.id || t._id) === taskId);
         if (task) {
-          const newComment: Comment = {
+          const newComment: any = {
             id: `c-${Date.now()}`,
             author,
             avatar,
@@ -81,10 +82,10 @@ const tasksSlice = createSlice({
             hasLiked: false,
           };
           task.comments = [...(task.comments || []), newComment];
-          task.commentsCount = task.comments.length;
+          (task as any).commentsCount = task.comments.length;
 
           // Append to Activity Logs
-          const newLog: ActivityLog = {
+          const newLog: any = {
             id: `log-${Date.now()}`,
             user: author,
             action: "added a comment",
@@ -106,10 +107,10 @@ const tasksSlice = createSlice({
       const { sprintId, taskId, commentId } = action.payload;
       const list = state.tasksBySprint[sprintId];
       if (list) {
-        const task = list.find((t) => t.id === taskId);
+        const task = list.find((t: any) => (t.id || t._id) === taskId);
         if (task && task.comments) {
-          task.comments = task.comments.map((c) => {
-            if (c.id === commentId) {
+          task.comments = task.comments.map((c: any) => {
+            if ((c.id || c._id) === commentId) {
               return {
                 ...c,
                 likes: c.hasLiked ? c.likes - 1 : c.likes + 1,

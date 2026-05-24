@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { mockData } from "@/data/mockData";
-import { Sprint, Task, TaskStatus } from "@/types/domain";
+import { Sprint, Task, TaskStatus } from "@/types/domain.types";
 
 export function useMySprintDetails(projectId: string, sprintId: string) {
   const [sprint, setSprint] = useState<Sprint | undefined>(() =>
@@ -41,7 +41,9 @@ export function useMySprintDetails(projectId: string, sprintId: string) {
 
   // Dynamic user-friendly statistics
   const totalTasksCount = tasks.length;
-  const completedTasksCount = tasks.filter((t) => t.status === "Done").length;
+  const completedTasksCount = tasks.filter(
+    (t) => t.status.toLowerCase() === "done",
+  ).length;
   const targetCapacity = 42; // Seed capacity points
 
   return {

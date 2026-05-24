@@ -1,78 +1,110 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import MpmsDatePicker from "@/components/features/form/MpmsDatePicker";
+import MpmsForm from "@/components/features/form/MpmsForm";
+import MpmsInput from "@/components/features/form/MpmsInput";
+import MpmsSelect from "@/components/features/form/MpmsSelect";
+import MpmsTextArea from "@/components/features/form/MpmsTextArea";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { handleApiError } from "@/lib/handleApiError";
+import { useCreateProjectMutation } from "@/redux/feature/projects/projectsApi";
+import { useUploadImageMutation } from "@/redux/feature/upload/uploadApi";
+import { CreateProjectDto, createProjectSchema } from "@/types/projects.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { CalendarIcon, CloudUpload, Info } from "lucide-react";
+import { CloudUpload, Info, Loader2, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-
-const formSchema = z.object({
-  title: z.string().min(2, "Title must be at least 2 characters"),
-  client: z.string().min(2, "Client name must be at least 2 characters"),
-  description: z.string().optional(),
-  budget: z.string().optional(),
-  status: z.string(),
-  startDate: z.date({
-    message: "A start date is required.",
-  }),
-  endDate: z.date({
-    message: "An end date is required.",
-  }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
 
 export function CreateProjectForm() {
   const router = useRouter();
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const [createProject, { isLoading }] = useCreateProjectMutation();
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
+
+  const methods = useForm<CreateProjectDto>({
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
       title: "",
       client: "",
       description: "",
       budget: "",
-      status: "Planning",
+      status: "planned",
+      startDate: "",
+      endDate: "",
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form Data:", data);
-    toast.success("Project workspace generated successfully!");
-    router.push("/projects");
+  const onSubmit = async (data: CreateProjectDto) => {
+    try {
+      const projectData = {
+        title: data.title,
+        client: data.client,
+        description: data.description,
+        budget: data.budget ? Number(data.budget) : undefined,
+        status: data.status,
+        startDate: new Date(data.startDate).toISOString(),
+        endDate: new Date(data.endDate).toISOString(),
+        ...(thumbnailUrl && { thumbnail: thumbnailUrl }),
+      };
+
+      await createProject(projectData).unwrap();
+      toast.success("Project workspace generated successfully!");
+      router.push("/projects");
+    } catch (error: any) {
+      if (error && error.status === 400) {
+        const errorSources = error.data?.errorSources;
+        if (Array.isArray(errorSources)) {
+          errorSources.forEach((src: any) => {
+            if (src.path) {
+              methods.setError(src.path as any, {
+                type: "server",
+                message: src.message,
+              });
+            } else {
+              toast.error(src.message);
+            }
+          });
+        } else {
+          toast.error(error.data?.message || "Invalid input details.");
+        }
+      } else {
+        handleApiError(error);
+      }
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const uploadResult = await uploadImage(formData).unwrap();
+      const secureUrl =
+        (uploadResult as any).data?.secure_url ||
+        (uploadResult as any).secure_url;
+      setThumbnailUrl(secureUrl);
+      toast.success("Image uploaded successfully!");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      toast.error("Failed to upload image.");
+    }
+  };
+
+  const removeThumbnail = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setThumbnailUrl("");
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="mt-8 space-y-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:space-y-0"
-      >
+    <MpmsForm<CreateProjectDto> onSubmit={onSubmit} methods={methods}>
+      <div className="mt-8 w-full space-y-6 overflow-hidden lg:grid lg:grid-cols-3 lg:gap-8 lg:space-y-0">
         {/* Left Column: General Information */}
         <div className="space-y-8 lg:col-span-2">
           <div className="border-border/50 bg-card rounded-xl border p-6 shadow-sm">
@@ -81,114 +113,44 @@ export function CreateProjectForm() {
             </h3>
 
             <div className="space-y-5">
-              <FormField
-                control={form.control}
+              <MpmsInput
                 name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                      Project Title
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., Quantum System Migration"
-                        className="bg-background"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Project Title"
+                placeholder="e.g., Quantum System Migration"
+                required
               />
 
-              <FormField
-                control={form.control}
+              <MpmsInput
                 name="client"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                      Client / Entity
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Select or type client name"
-                        className="bg-background"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Client / Entity"
+                placeholder="Select or type client name"
+                required
               />
 
-              <FormField
-                control={form.control}
+              <MpmsTextArea
                 name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                      Description
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Define project scope, objectives, and key deliverables..."
-                        className="bg-background min-h-30 resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Description"
+                placeholder="Define project scope, objectives, and key deliverables..."
+                rows={4}
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
+                <MpmsInput
                   name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                        Budget ($)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="0.00"
-                          className="bg-background"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Budget ($)"
+                  type="number"
+                  placeholder="0.00"
                 />
 
-                <FormField
-                  control={form.control}
+                <MpmsSelect
                   name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                        Status
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-background">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Planning">Planning</SelectItem>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="On Hold">On Hold</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Status"
+                  options={[
+                    { label: "Planning", value: "planned" },
+                    { label: "Active", value: "active" },
+                    { label: "On Hold", value: "archived" },
+                    { label: "Completed", value: "completed" },
+                  ]}
                 />
               </div>
             </div>
@@ -202,82 +164,12 @@ export function CreateProjectForm() {
               Timeline
             </h3>
             <div className="space-y-5">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <div className="flex flex-col">
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                        Start Date
-                      </FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`bg-background border-border w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? (
-                                format(field.value, "MM/dd/yyyy")
-                              ) : (
-                                <span>mm/dd/yyyy</span>
-                              )}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  </div>
-                )}
-              />
+              <MpmsDatePicker name="startDate" label="Start Date" required />
 
-              <FormField
-                control={form.control}
+              <MpmsDatePicker
                 name="endDate"
-                render={({ field }) => (
-                  <div className="flex flex-col">
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                        End Date (Estimated)
-                      </FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`bg-background border-border w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? (
-                                format(field.value, "MM/dd/yyyy")
-                              ) : (
-                                <span>mm/dd/yyyy</span>
-                              )}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  </div>
-                )}
+                label="End Date (Estimated)"
+                required
               />
             </div>
           </div>
@@ -290,16 +182,52 @@ export function CreateProjectForm() {
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 Thumbnail
               </span>
-              <div className="border-border/80 bg-background/50 hover:bg-muted/50 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-colors">
-                <div className="bg-primary/10 text-primary mb-4 rounded-full p-3">
-                  <CloudUpload className="h-6 w-6" />
-                </div>
-                <p className="text-foreground text-sm font-medium">
-                  Click to upload or drag and drop
-                </p>
-                <p className="text-muted-foreground mt-1 text-[10px] uppercase">
-                  SVG, PNG, JPG or GIF (max. 800x400px)
-                </p>
+              <div className="border-border/80 bg-background/50 hover:bg-muted/50 relative flex min-h-40 flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed p-6 text-center transition-colors">
+                {isUploading ? (
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                    <p className="text-muted-foreground text-xs">
+                      Uploading image...
+                    </p>
+                  </div>
+                ) : thumbnailUrl ? (
+                  <div className="group relative h-full min-h-30 w-full overflow-hidden rounded-md">
+                    <Image
+                      src={thumbnailUrl}
+                      alt="Thumbnail Preview"
+                      width={500}
+                      height={128}
+                      className="h-32 w-full rounded-md object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={removeThumbnail}
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full p-2 shadow-sm transition-transform hover:scale-105"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
+                      onChange={handleFileChange}
+                    />
+                    <div className="bg-primary/10 text-primary mb-3 rounded-full p-3">
+                      <CloudUpload className="h-6 w-6" />
+                    </div>
+                    <p className="text-foreground text-sm font-medium">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-muted-foreground mt-1 text-[10px] uppercase">
+                      SVG, PNG, JPG or GIF (max. 800x400px)
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -325,12 +253,14 @@ export function CreateProjectForm() {
           </Button>
           <Button
             type="submit"
+            disabled={isLoading || isUploading}
             className="w-full px-6 text-xs font-semibold shadow-sm sm:w-auto"
           >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Project
           </Button>
         </div>
-      </form>
-    </Form>
+      </div>
+    </MpmsForm>
   );
 }

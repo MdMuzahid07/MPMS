@@ -1,0 +1,52 @@
+
+> MPMS-client@0.1.0 type-check
+> tsc --noEmit
+
+src/components/features/projects/CreateProjectForm.tsx(64,7): error TS2322: Type 'Resolver<{ title: string; client: string; startDate: string; endDate: string; description?: string | undefined; budget?: unknown; status?: "active" | "planned" | "archived" | "completed" | undefined; }, any, { ...; }>' is not assignable to type 'Resolver<{ title: string; client: string; startDate: string; endDate: string; description?: string | undefined; budget?: number | undefined; status?: "active" | "planned" | "archived" | "completed" | undefined; }>'.
+  Types of parameters 'options' and 'options' are incompatible.
+    Type 'ResolverOptions<{ title: string; client: string; startDate: string; endDate: string; description?: string | undefined; budget?: number | undefined; status?: "active" | "planned" | "archived" | "completed" | undefined; }>' is not assignable to type 'ResolverOptions<{ title: string; client: string; startDate: string; endDate: string; description?: string | undefined; budget?: unknown; status?: "active" | "planned" | "archived" | "completed" | undefined; }>'.
+      Type 'unknown' is not assignable to type 'number | undefined'.
+src/components/features/projects/ProjectEditForm.tsx(95,7): error TS2322: Type 'Resolver<{ title?: string | undefined; client?: string | undefined; description?: string | undefined; budget?: unknown; status?: "active" | "planned" | "archived" | "completed" | undefined; startDate?: string | undefined; endDate?: string | undefined; }, any, { ...; }>' is not assignable to type 'Resolver<UpdateProjectDto>'.
+  Types of parameters 'options' and 'options' are incompatible.
+    Type 'ResolverOptions<UpdateProjectDto>' is not assignable to type 'ResolverOptions<{ title?: string | undefined; client?: string | undefined; description?: string | undefined; budget?: unknown; status?: "active" | "planned" | "archived" | "completed" | undefined; startDate?: string | undefined; endDate?: string | undefined; }>'.
+      Types of property 'names' are incompatible.
+        Type '("status" | "id" | "title" | "client" | "description" | "startDate" | "endDate" | "budget")[] | undefined' is not assignable to type '("status" | "title" | "client" | "description" | "startDate" | "endDate" | "budget")[] | undefined'.
+          Type '("status" | "id" | "title" | "client" | "description" | "startDate" | "endDate" | "budget")[]' is not assignable to type '("status" | "title" | "client" | "description" | "startDate" | "endDate" | "budget")[]'.
+            Type '"status" | "id" | "title" | "client" | "description" | "startDate" | "endDate" | "budget"' is not assignable to type '"status" | "title" | "client" | "description" | "startDate" | "endDate" | "budget"'.
+              Type '"id"' is not assignable to type '"status" | "title" | "client" | "description" | "startDate" | "endDate" | "budget"'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(8,10): error TS2678: Type '"Active"' is not comparable to type 'ProjectStatus'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(10,10): error TS2678: Type '"At Risk"' is not comparable to type 'ProjectStatus'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(25,40): error TS2339: Property 'id' does not exist on type 'Omit<Project, "icon"> & { icon?: ReactNode; }'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(46,20): error TS2339: Property 'name' does not exist on type 'Omit<Project, "icon"> & { icon?: ReactNode; }'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(55,54): error TS2339: Property 'progress' does not exist on type 'Omit<Project, "icon"> & { icon?: ReactNode; }'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(61,23): error TS2339: Property 'progressColor' does not exist on type 'Omit<Project, "icon"> & { icon?: ReactNode; }'.
+src/components/features/user-dashboard/my-project-view/ProjectCard.tsx(63,40): error TS2339: Property 'progress' does not exist on type 'Omit<Project, "icon"> & { icon?: ReactNode; }'.
+src/components/features/user-dashboard/my-project-view/TaskItem.tsx(4,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'TaskPriority'.
+src/data/mockData.ts(3,3): error TS2305: Module '"@/types/domain.types"' has no exported member 'Sprint'.
+src/data/mockData.ts(4,3): error TS2305: Module '"@/types/domain.types"' has no exported member 'Task'.
+src/data/mockData.ts(5,3): error TS2305: Module '"@/types/domain.types"' has no exported member 'Comment'.
+src/data/mockData.ts(6,3): error TS2305: Module '"@/types/domain.types"' has no exported member 'ActivityLog'.
+src/data/mockData.ts(7,3): error TS2305: Module '"@/types/domain.types"' has no exported member 'TaskStatus'.
+src/data/mockData.ts(19,5): error TS2820: Type '"Active"' is not assignable to type 'ProjectStatus'. Did you mean '"active"'?
+src/data/mockData.ts(36,5): error TS2322: Type '"On Hold"' is not assignable to type 'ProjectStatus'.
+src/data/mockData.ts(53,5): error TS2820: Type '"Active"' is not assignable to type 'ProjectStatus'. Did you mean '"active"'?
+src/data/mockData.ts(219,37): error TS2339: Property 'id' does not exist on type 'Project'.
+src/data/mockData.ts(335,40): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/hooks/useMyProjectDetails.ts(13,50): error TS2339: Property 'progress' does not exist on type 'Project'.
+src/hooks/useMySprintDetails.ts(5,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Sprint'.
+src/hooks/useMySprintDetails.ts(5,18): error TS2305: Module '"@/types/domain.types"' has no exported member 'Task'.
+src/hooks/useMySprintDetails.ts(5,24): error TS2305: Module '"@/types/domain.types"' has no exported member 'TaskStatus'.
+src/hooks/useMyTaskDetails.ts(5,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Task'.
+src/hooks/useMyTaskDetails.ts(5,16): error TS2305: Module '"@/types/domain.types"' has no exported member 'Comment'.
+src/hooks/useMyTaskDetails.ts(5,25): error TS2305: Module '"@/types/domain.types"' has no exported member 'ActivityLog'.
+src/hooks/useMyTaskDetails.ts(5,38): error TS2305: Module '"@/types/domain.types"' has no exported member 'TaskStatus'.
+src/redux/feature/sprints/sprintsApi.ts(2,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Sprint'.
+src/redux/feature/sprints/sprintsSlice.ts(2,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Sprint'.
+src/redux/feature/tasks/tasksApi.ts(2,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Task'.
+src/redux/feature/tasks/tasksSlice.ts(2,10): error TS2305: Module '"@/types/domain.types"' has no exported member 'Task'.
+src/redux/feature/tasks/tasksSlice.ts(2,16): error TS2305: Module '"@/types/domain.types"' has no exported member 'Comment'.
+src/redux/feature/tasks/tasksSlice.ts(2,25): error TS2305: Module '"@/types/domain.types"' has no exported member 'ActivityLog'.
+src/redux/feature/tasks/tasksSlice.ts(2,38): error TS2305: Module '"@/types/domain.types"' has no exported member 'TaskStatus'.
+src/redux/feature/tasks/tasksSlice.ts(111,46): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/view/admin/project/ProjectsView.tsx(24,29): error TS2307: Cannot find module '@/hooks/useDebounce' or its corresponding type declarations.
+src/view/user/MyProjectsView.tsx(28,30): error TS2339: Property 'id' does not exist on type '{ icon: Element; _id: string; title: string; client: string; description: string; startDate: string; endDate: string; budget: number; status: ProjectStatus; thumbnail?: string | undefined; members: User[]; createdBy: string | User; createdAt: string; updatedAt: string; }'.

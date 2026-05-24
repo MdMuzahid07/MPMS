@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Sprint } from "@/types/domain";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { mockData } from "@/data/mockData";
+import { Sprint } from "@/types/domain.types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface SprintsState {
   sprintsByProject: Record<string, Sprint[]>;
@@ -36,9 +37,9 @@ const sprintsSlice = createSlice({
       const { projectId, sprintId, progress } = action.payload;
       const list = state.sprintsByProject[projectId];
       if (list) {
-        const sprint = list.find((s) => s.id === sprintId);
+        const sprint = list.find((s: any) => (s.id || s._id) === sprintId);
         if (sprint) {
-          sprint.progress = progress;
+          (sprint as any).progress = progress;
         }
       }
     },

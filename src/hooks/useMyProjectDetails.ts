@@ -10,7 +10,8 @@ export function useMyProjectDetails(projectId: string) {
   const openTasksCount = 14; // Seeded count matching mockup UI
   const completedTasksCount = 32; // Seeded count matching mockup UI
   const totalTasksCount = openTasksCount + completedTasksCount;
-  const completionPercentage = project ? project.progress : 68;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const completionPercentage = project ? (project as any).progress : 68;
 
   return {
     project,

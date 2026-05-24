@@ -1,18 +1,12 @@
-import {
-  Project,
-  Sprint,
-  Task,
-  Comment,
-  ActivityLog,
-  TaskStatus,
-} from "@/types/domain";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ─── Initial Database Seeds with User-Friendly Names ────────────────
 
-const INITIAL_PROJECTS: Project[] = [
+const INITIAL_PROJECTS: any[] = [
   {
+    _id: "1",
     id: "1",
     name: "Financial Operations Portal",
+    title: "Financial Operations Portal",
     client: "Acme Corp",
     description:
       "Enterprise workflow platform for standardizing financial transaction flows, billing validations, and customer account administration.",
@@ -28,8 +22,10 @@ const INITIAL_PROJECTS: Project[] = [
     ],
   },
   {
+    _id: "2",
     id: "2",
     name: "Customer Experience Portal",
+    title: "Customer Experience Portal",
     client: "Starlight Inc",
     description:
       "Modern interface dashboard built for organizing user requests, resolving feedback, and streamlining customer onboarding workflows.",
@@ -45,8 +41,10 @@ const INITIAL_PROJECTS: Project[] = [
     ],
   },
   {
+    _id: "3",
     id: "3",
     name: "Security Audit Framework",
+    title: "Security Audit Framework",
     client: "Cyberdyne",
     description:
       "Automated system built for validating compliance rules, evaluating account permissions, and tracking access audit logs across folders.",
@@ -63,9 +61,10 @@ const INITIAL_PROJECTS: Project[] = [
   },
 ];
 
-const INITIAL_SPRINTS: Record<string, Sprint[]> = {
+const INITIAL_SPRINTS: any = {
   "1": [
     {
+      _id: "sprint-4",
       id: "sprint-4",
       title: "Sprint 04: Component Design & Polish",
       dateRange: "Sept 12 - Sept 26",
@@ -74,6 +73,7 @@ const INITIAL_SPRINTS: Record<string, Sprint[]> = {
       team: ["/profile/picture/3", "/profile/picture/4"],
     },
     {
+      _id: "sprint-3",
       id: "sprint-3",
       title: "Sprint 03: Feature Flow Validation",
       dateRange: "Aug 28 - Sept 11",
@@ -82,6 +82,7 @@ const INITIAL_SPRINTS: Record<string, Sprint[]> = {
       team: ["/profile/picture/5"],
     },
     {
+      _id: "sprint-5",
       id: "sprint-5",
       title: "Sprint 05: Data Integrations & Testing",
       dateRange: "Sept 27 - Oct 11",
@@ -92,6 +93,7 @@ const INITIAL_SPRINTS: Record<string, Sprint[]> = {
   ],
   "2": [
     {
+      _id: "sprint-2-1",
       id: "sprint-2-1",
       title: "Sprint 01: Initial Layout Blueprint",
       dateRange: "Aug 01 - Aug 15",
@@ -102,6 +104,7 @@ const INITIAL_SPRINTS: Record<string, Sprint[]> = {
   ],
   "3": [
     {
+      _id: "sprint-3-1",
       id: "sprint-3-1",
       title: "Sprint 01: Audit Framework Prototypes",
       dateRange: "Aug 15 - Aug 30",
@@ -112,9 +115,10 @@ const INITIAL_SPRINTS: Record<string, Sprint[]> = {
   ],
 };
 
-const INITIAL_TASKS: Record<string, Task[]> = {
+const INITIAL_TASKS: any = {
   "sprint-4": [
     {
+      _id: "task-1",
       id: "task-1",
       title: "Optimize Platform Page Load Times",
       priority: "High",
@@ -130,8 +134,14 @@ const INITIAL_TASKS: Record<string, Task[]> = {
       commentsCount: 1,
       comments: [
         {
+          _id: "c-1",
           id: "c-1",
-          author: "Alex Rivers",
+          author: {
+            _id: "u-1",
+            name: "Alex Rivers",
+            email: "alex@example.com",
+            role: "member",
+          },
           avatar:
             "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop",
           timestamp: "2 hours ago",
@@ -143,6 +153,7 @@ const INITIAL_TASKS: Record<string, Task[]> = {
       ],
     },
     {
+      _id: "task-2",
       id: "task-2",
       title: "Update Platform Integration Guides",
       priority: "Medium",
@@ -154,6 +165,7 @@ const INITIAL_TASKS: Record<string, Task[]> = {
       comments: [],
     },
     {
+      _id: "task-3",
       id: "task-3",
       title: "Improve Dashboard Feed Performance",
       priority: "High",
@@ -165,6 +177,7 @@ const INITIAL_TASKS: Record<string, Task[]> = {
       comments: [],
     },
     {
+      _id: "task-4",
       id: "task-4",
       title: "Enhance Platform Security Audit Logs",
       priority: "Low",
@@ -178,21 +191,24 @@ const INITIAL_TASKS: Record<string, Task[]> = {
   ],
 };
 
-const INITIAL_ACTIVITY_LOGS: Record<string, ActivityLog[]> = {
+const INITIAL_ACTIVITY_LOGS: any = {
   "task-1": [
     {
+      _id: "log-1",
       id: "log-1",
       user: "Alex Rivers",
       action: "changed status to In Progress",
       timestamp: "10 minutes ago",
     },
     {
+      _id: "log-2",
       id: "log-2",
       user: "Sarah Chen",
       action: "updated the task description",
       timestamp: "2 hours ago",
     },
     {
+      _id: "log-3",
       id: "log-3",
       user: "System",
       action: "added attachment benchmark_v1.json",
@@ -211,41 +227,43 @@ const dbActivityLogs = { ...INITIAL_ACTIVITY_LOGS };
 // ─── Database Operations API ──────────────────────────────────────────
 
 export const mockData = {
-  getProjects: (): Project[] => {
+  getProjects: (): any[] => {
     return dbProjects;
   },
 
-  getProjectById: (id: string): Project | undefined => {
-    return dbProjects.find((p) => p.id === id);
+  getProjectById: (id: string): any => {
+    return dbProjects.find((p) => p.id === id || p._id === id);
   },
 
-  getSprintsByProject: (projectId: string): Sprint[] => {
+  getSprintsByProject: (projectId: string): any[] => {
     return dbSprints[projectId] || [];
   },
 
-  getSprintById: (projectId: string, sprintId: string): Sprint | undefined => {
+  getSprintById: (projectId: string, sprintId: string): any => {
     const list = dbSprints[projectId] || [];
-    return list.find((s) => s.id === sprintId);
+    return list.find((s: any) => s.id === sprintId || s._id === sprintId);
   },
 
-  getTasksBySprint: (sprintId: string): Task[] => {
+  getTasksBySprint: (sprintId: string): any[] => {
     return dbTasks[sprintId] || [];
   },
 
-  getTaskById: (sprintId: string, taskId: string): Task | undefined => {
+  getTaskById: (sprintId: string, taskId: string): any => {
     const list = dbTasks[sprintId] || [];
-    return list.find((t) => t.id === taskId);
+    return list.find((t: any) => t.id === taskId || t._id === taskId);
   },
 
   updateTaskStatus: (
     sprintId: string,
     taskId: string,
-    newStatus: TaskStatus,
+    newStatus: any,
   ): boolean => {
     const list = dbTasks[sprintId];
     if (!list) return false;
 
-    const taskIndex = list.findIndex((t) => t.id === taskId);
+    const taskIndex = list.findIndex(
+      (t: any) => t.id === taskId || t._id === taskId,
+    );
     if (taskIndex === -1) return false;
 
     const task = list[taskIndex];
@@ -260,7 +278,8 @@ export const mockData = {
     dbTasks[sprintId] = [...list];
 
     // Append to Activity Logs
-    const newLog: ActivityLog = {
+    const newLog: any = {
+      _id: `log-${Date.now()}`,
       id: `log-${Date.now()}`,
       user: "Md Muzahid",
       action: `changed status from ${oldStatus} to ${newStatus}`,
@@ -276,19 +295,27 @@ export const mockData = {
     sprintId: string,
     taskId: string,
     content: string,
-  ): Comment | undefined => {
+  ): any => {
     const list = dbTasks[sprintId];
     if (!list) return undefined;
 
-    const taskIndex = list.findIndex((t) => t.id === taskId);
+    const taskIndex = list.findIndex(
+      (t: any) => t.id === taskId || t._id === taskId,
+    );
     if (taskIndex === -1) return undefined;
 
     const task = list[taskIndex];
     if (!task) return undefined;
 
-    const newComment: Comment = {
+    const newComment: any = {
+      _id: `c-${Date.now()}`,
       id: `c-${Date.now()}`,
-      author: "Md Muzahid",
+      author: {
+        _id: "u-1",
+        name: "Md Muzahid",
+        email: "muzahid@example.com",
+        role: "member",
+      },
       avatar:
         "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop",
       timestamp: "Just now",
@@ -306,7 +333,8 @@ export const mockData = {
     dbTasks[sprintId] = [...list];
 
     // Append to Activity Logs
-    const newLog: ActivityLog = {
+    const newLog: any = {
+      _id: `log-${Date.now()}`,
       id: `log-${Date.now()}`,
       user: "Md Muzahid",
       action: "added a comment",
@@ -326,14 +354,16 @@ export const mockData = {
     const list = dbTasks[sprintId];
     if (!list) return false;
 
-    const taskIndex = list.findIndex((t) => t.id === taskId);
+    const taskIndex = list.findIndex(
+      (t: any) => t.id === taskId || t._id === taskId,
+    );
     if (taskIndex === -1) return false;
 
     const task = list[taskIndex];
     if (!task || !task.comments) return false;
 
-    task.comments = task.comments.map((c) => {
-      if (c.id === commentId) {
+    task.comments = task.comments.map((c: any) => {
+      if (c.id === commentId || c._id === commentId) {
         return {
           ...c,
           likes: c.hasLiked ? c.likes - 1 : c.likes + 1,
@@ -347,7 +377,7 @@ export const mockData = {
     return true;
   },
 
-  getActivityLogs: (taskId: string): ActivityLog[] => {
+  getActivityLogs: (taskId: string): any[] => {
     return dbActivityLogs[taskId] || [];
   },
 };

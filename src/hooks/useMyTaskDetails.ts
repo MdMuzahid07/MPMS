@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { mockData } from "@/data/mockData";
-import { Task, Comment, ActivityLog, TaskStatus } from "@/types/domain";
+import { Task, Comment, ActivityLog, TaskStatus } from "@/types/domain.types";
 
 export function useMyTaskDetails(sprintId: string, taskId: string) {
   const [task, setTask] = useState<Task | undefined>(() =>

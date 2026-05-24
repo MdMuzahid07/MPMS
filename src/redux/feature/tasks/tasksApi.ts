@@ -1,5 +1,5 @@
 import baseApi from "../../api/baseApi";
-import { Task } from "@/types/domain";
+import { Task } from "@/types/domain.types";
 
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -1,49 +1,29 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { mockData } from "@/data/mockData";
+import { handleApiError } from "@/lib/handleApiError";
+import { useGetProjectsQuery } from "@/redux/feature/projects/projectsApi";
+import { useAppSelector } from "@/redux/hooks";
+import { useEffect } from "react";
 
-export function useMyProjects() {
-  const projects = mockData.getProjects();
-  const [searchQuery, setSearchQuery] = useState("");
+export const useMyProjects = () => {
+  const userId = useAppSelector((state) => state.auth.user?.id);
 
-  // Extract all active tasks from our mock data to show in the sidebar
-  const activeTasks = useMemo(() => {
-    // In our seeded mock database, tasks for "sprint-4" represent active tasks
-    const sprint4Tasks = mockData.getTasksBySprint("sprint-4");
-    // Filter active/in-progress tasks to display
-    return sprint4Tasks
-      .filter((t) => t.status !== "Done")
-      .map((t) => ({
-        id: t.id,
-        title: t.title,
-        project: "Quantum API Gateway", // Seed project name matching mocks
-        priority: t.priority,
-        dueDate:
-          t.priority === "High"
-            ? "Due in 4h"
-            : t.priority === "Medium"
-              ? "Due Tomorrow"
-              : "Feb 24",
-      }));
-  }, []);
+  const { data, isLoading, isFetching, error } = useGetProjectsQuery(
+    { userId: userId! },
+    { skip: !userId },
+  );
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((p) => {
-      const q = searchQuery.toLowerCase().trim();
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.client.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-      );
-    });
-  }, [projects, searchQuery]);
+  useEffect(() => {
+    if (error) {
+      handleApiError(error);
+    }
+  }, [error]);
 
   return {
-    projects: filteredProjects,
-    totalProjectsCount: projects.length,
-    activeTasks,
-    searchQuery,
-    setSearchQuery,
+    projects: data ?? [],
+    activeTasks: [], // Temporarily mocked until tasks API is implemented
+    isLoading: isLoading || isFetching,
+    isEmpty: !isLoading && (!data || data.length === 0),
+    error,
   };
-}
+};

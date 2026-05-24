@@ -1,5 +1,10 @@
 import ProjectDetailsView from "../../../../../view/admin/project/ProjectDetailsView";
 
-export default function page({ params }: { params: { id: string } }) {
-  return <ProjectDetailsView params={params} />;
+export default async function page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <ProjectDetailsView id={id} />;
 }

@@ -1,5 +1,5 @@
 import baseApi from "../../api/baseApi";
-import { Sprint } from "@/types/domain";
+import { Sprint } from "@/types/domain.types";
 
 export const sprintsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

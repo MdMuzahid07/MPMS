@@ -1,12 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import baseApi from "./api/baseApi";
-import authReducer from "./feature/auth/authSlice";
-import projectsReducer from "./feature/projects/projectsSlice";
-import sprintsReducer from "./feature/sprints/sprintsSlice";
-import tasksReducer from "./feature/tasks/tasksSlice";
 import {
   persistStore,
-  persistReducer,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -14,44 +8,13 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import createWebStorage from "redux-persist/lib/storage/createWebStorage";
+import { rootReducer } from "./rootReducer";
+import { injectStore } from "@/lib/axios";
 
-// SSR-Safe Storage Fallback for Next.js App Router
-const createNoopStorage = () => {
-  return {
-    getItem() {
-      return Promise.resolve(null);
-    },
-    setItem(_key: string, value: unknown) {
-      return Promise.resolve(value);
-    },
-    removeItem() {
-      return Promise.resolve();
-    },
-  };
-};
-
-const storage =
-  typeof window !== "undefined"
-    ? createWebStorage("local")
-    : createNoopStorage();
-
-const persistConfig = {
-  key: "auth",
-  storage,
-  whitelist: ["accessToken", "user", "isAuthenticated"],
-};
-
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+import baseApi from "./api/baseApi";
 
 export const store = configureStore({
-  reducer: {
-    [baseApi.reducerPath]: baseApi.reducer,
-    auth: persistedAuthReducer,
-    projects: projectsReducer,
-    sprints: sprintsReducer,
-    tasks: tasksReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -59,6 +22,9 @@ export const store = configureStore({
       },
     }).concat(baseApi.middleware),
 });
+
+// Inject store to Axios interceptors to avoid circular dependencies
+injectStore(store);
 
 export const persistor = persistStore(store);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { TaskPriority } from "@/types/domain";
+import { TaskPriority } from "@/types/domain.types";
 
 export interface DashboardTask {
   id: string;
@@ -16,19 +16,25 @@ interface TaskItemProps {
   onClick?: (taskId: string) => void;
 }
 
-const PRIORITY_COLOR: Record<TaskPriority, string> = {
+const PRIORITY_COLOR: Record<string, string> = {
+  high: "text-destructive",
+  urgent: "text-destructive font-black",
+  medium: "text-amber-500",
+  low: "text-muted-foreground",
   High: "text-destructive",
+  Urgent: "text-destructive font-black",
   Medium: "text-amber-500",
   Low: "text-muted-foreground",
 };
 
 export const TaskItem = ({ task, onClick }: TaskItemProps) => {
+  const priorityKey = task.priority || "low";
   return (
     <div
       onClick={() => onClick?.(task.id)}
       className={cn(
         "border-border bg-surface hover:bg-surface-container-low group cursor-pointer rounded-lg border p-3 transition-colors",
-        task.priority === "Low" && "opacity-60 hover:opacity-100",
+        priorityKey.toLowerCase() === "low" && "opacity-60 hover:opacity-100",
       )}
     >
       <div className="flex items-start gap-3">
