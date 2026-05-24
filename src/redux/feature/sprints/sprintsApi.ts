@@ -10,7 +10,61 @@ export const sprintsApi = baseApi.injectEndpoints({
       }),
       providesTags: ["sprints"],
     }),
+    createSprint: builder.mutation<
+      Sprint,
+      {
+        projectId: string;
+        data: {
+          title: string;
+          startDate: string;
+          endDate: string;
+          status: string;
+        };
+      }
+    >({
+      query: ({ projectId, data }) => ({
+        url: `/projects/${projectId}/sprints`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["sprints"],
+    }),
+    updateSprint: builder.mutation<
+      Sprint,
+      {
+        projectId: string;
+        sprintId: string;
+        data: {
+          title?: string;
+          startDate?: string;
+          endDate?: string;
+          status?: string;
+        };
+      }
+    >({
+      query: ({ projectId, sprintId, data }) => ({
+        url: `/projects/${projectId}/sprints/${sprintId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["sprints"],
+    }),
+    deleteSprint: builder.mutation<
+      void,
+      { projectId: string; sprintId: string }
+    >({
+      query: ({ projectId, sprintId }) => ({
+        url: `/projects/${projectId}/sprints/${sprintId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["sprints"],
+    }),
   }),
 });
 
-export const { useGetSprintsQuery } = sprintsApi;
+export const {
+  useGetSprintsQuery,
+  useCreateSprintMutation,
+  useUpdateSprintMutation,
+  useDeleteSprintMutation,
+} = sprintsApi;

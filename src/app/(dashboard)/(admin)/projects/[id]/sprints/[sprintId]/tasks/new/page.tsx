@@ -1,9 +1,10 @@
 import SprintTaskCreateView from "../../../../../../../../../view/admin/sprint/SprintTaskCreateView";
 
-export default function page({
+export default async function page({
   params,
 }: {
-  params: { id: string; sprintId: string };
+  params: Promise<{ id: string; sprintId: string }>;
 }) {
-  return <SprintTaskCreateView params={params} />;
+  const resolvedParams = await params;
+  return <SprintTaskCreateView params={resolvedParams} />;
 }

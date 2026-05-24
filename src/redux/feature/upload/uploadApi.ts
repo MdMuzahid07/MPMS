@@ -15,7 +15,25 @@ export const uploadApi = baseApi.injectEndpoints({
         data: { secure_url: string; public_id: string };
       }) => response.data,
     }),
+    uploadAttachment: builder.mutation<
+      { secure_url: string; public_id: string; original_filename: string },
+      FormData
+    >({
+      query: (body) => ({
+        url: `/upload/attachment`,
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response: {
+        data: {
+          secure_url: string;
+          public_id: string;
+          original_filename: string;
+        };
+      }) => response.data,
+    }),
   }),
 });
 
-export const { useUploadImageMutation } = uploadApi;
+export const { useUploadImageMutation, useUploadAttachmentMutation } =
+  uploadApi;

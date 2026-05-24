@@ -188,7 +188,7 @@ export const AddMemberDialog = ({
                           ? "React, Golang, Kubernetes"
                           : ""
                       }
-                      className="h-7 min-w-[120px] flex-1 border-0 px-1 py-0 text-sm shadow-none focus-visible:ring-0"
+                      className="h-7 min-w-30 flex-1 border-0 px-1 py-0 text-sm shadow-none focus-visible:ring-0"
                       value={skillInput}
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => {

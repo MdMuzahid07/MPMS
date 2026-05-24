@@ -11,7 +11,7 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { KanbanBoard } from "./KanbanBoard";
 import type { TaskItem, TaskStatus } from "./task.types";
@@ -33,6 +33,11 @@ export const TaskCanvas = ({
 }: TaskCanvasProps) => {
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTasks(initialTasks);
+  }, [initialTasks]);
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState("");
@@ -171,7 +176,7 @@ export const TaskCanvas = ({
       )}
 
       {/* Control Canvas (Switcher & Filters) */}
-      <div className="border-border flex flex-col gap-4 rounded-xl border bg-[#f4f4f7]/60 p-4 dark:bg-[#111118]/60">
+      <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {/* Quick Search */}
           <div className="relative max-w-md flex-grow">
@@ -319,7 +324,7 @@ export const TaskCanvas = ({
       </div>
 
       {/* Render Canvas Contents */}
-      <div className="border-border overflow-hidden rounded-xl border bg-[#f4f4f7]/40 p-4 dark:bg-[#111118]/40">
+      <div className="border-border bg-card/50 overflow-hidden rounded-xl border p-4">
         {filteredTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <SlidersHorizontal className="text-muted-foreground/45 mb-4 size-10" />

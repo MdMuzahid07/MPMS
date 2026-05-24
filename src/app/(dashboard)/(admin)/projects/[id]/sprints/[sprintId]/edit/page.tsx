@@ -1,9 +1,10 @@
 import SprintEditView from "../../../../../../../../view/admin/sprint/SprintEditView";
 
-export default function page({
+export default async function page({
   params,
 }: {
-  params: { id: string; sprintId: string };
+  params: Promise<{ id: string; sprintId: string }>;
 }) {
-  return <SprintEditView params={params} />;
+  const resolvedParams = await params;
+  return <SprintEditView params={resolvedParams} />;
 }

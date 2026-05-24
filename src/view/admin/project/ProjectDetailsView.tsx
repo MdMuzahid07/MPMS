@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -254,7 +256,9 @@ export default function ProjectDetailsView({
 
       <section className="grid gap-4 lg:grid-cols-[1fr_1.2fr_0.72fr]">
         <article className="bg-card border-border rounded-lg border p-4">
-          <h3 className="text-lg font-semibold">Sprint Velocity</h3>
+          <h3 className="text-lg font-semibold">
+            Sprint Performance & Delivery Trend
+          </h3>
           <div className="mt-6">
             <div className="flex h-28 items-end gap-2">
               {velocityBySprint.map((bar) => {
@@ -284,7 +288,7 @@ export default function ProjectDetailsView({
           </div>
           <div className="border-border mt-6 border-t pt-4">
             <p className="text-muted-foreground text-[11px]">
-              Average Velocity
+              Average Delivery Pace
             </p>
             <div className="mt-1 flex items-center justify-between">
               <p className="text-lg font-semibold">54 pts/sprint</p>
@@ -345,14 +349,6 @@ export default function ProjectDetailsView({
           </div>
         </article>
       </section>
-
-      <button
-        type="button"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 inline-flex size-11 items-center justify-center rounded-lg shadow-lg transition-colors"
-        aria-label="Create new"
-      >
-        <Plus className="size-5" />
-      </button>
     </div>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import type { TaskItem, TaskStatus } from "./task.types";
-import { PriorityBadge } from "./PriorityBadge";
-import { AssigneeBadge } from "./AssigneeBadge";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Clock } from "lucide-react";
+import React, { useState } from "react";
+import { AssigneeBadge } from "./AssigneeBadge";
+import { PriorityBadge } from "./PriorityBadge";
+import type { TaskItem, TaskStatus } from "./task.types";
 import { TaskActionsMenu } from "./TaskActionsMenu";
 
 interface KanbanBoardProps {
@@ -95,7 +95,7 @@ export const KanbanBoard = ({
   );
 
   return (
-    <div className="grid min-w-[900px] grid-cols-1 gap-4 overflow-x-auto pb-4 md:grid-cols-4 lg:gap-6">
+    <div className="grid min-w-225 grid-cols-1 gap-4 overflow-x-auto pb-4 md:grid-cols-4 lg:gap-6">
       {COLUMNS.map((col) => {
         const columnTasks = groupedTasks[col.status] || [];
         const isOver = activeColumn === col.status;
@@ -107,9 +107,9 @@ export const KanbanBoard = ({
             onDragLeave={() => setActiveColumn(null)}
             onDrop={(e) => handleDrop(e, col.status)}
             className={cn(
-              "border-border/40 flex min-h-[500px] flex-col rounded-xl border bg-[#f4f4f7] p-3 transition-all duration-200 dark:bg-[#111118]/80",
+              "border-border/40 bg-muted/40 flex min-h-125 flex-col rounded-xl border p-3 transition-all duration-200",
               isOver
-                ? "border-primary/40 bg-primary/[0.02] ring-primary/20 scale-[0.99] ring-1"
+                ? "border-primary/40 bg-primary/2 ring-primary/20 scale-[0.99] ring-1"
                 : "",
               col.tone,
             )}
@@ -133,7 +133,7 @@ export const KanbanBoard = ({
             {/* Column Task Cards */}
             <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
               {columnTasks.length === 0 ? (
-                <div className="border-border/30 text-muted-foreground/60 flex min-h-[200px] flex-1 flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center text-xs">
+                <div className="border-border/30 text-muted-foreground/60 flex min-h-50 flex-1 flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center text-xs">
                   Drop tasks here
                 </div>
               ) : (
@@ -150,7 +150,7 @@ export const KanbanBoard = ({
                   >
                     {/* Project & Priority Header */}
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="text-muted-foreground max-w-[120px] truncate text-[10px] font-semibold tracking-wider uppercase">
+                      <span className="text-muted-foreground max-w-30 truncate text-[10px] font-semibold tracking-wider uppercase">
                         {task.project}
                       </span>
                       <div className="flex items-center gap-1">

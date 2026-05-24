@@ -1,9 +1,10 @@
 import SprintDetailView from "../../../../../../../view/admin/sprint/SprintDetailsView";
 
-export default function page({
+export default async function page({
   params,
 }: {
-  params: { id: string; sprintId: string };
+  params: Promise<{ id: string; sprintId: string }>;
 }) {
-  return <SprintDetailView params={params} />;
+  const resolvedParams = await params;
+  return <SprintDetailView params={resolvedParams} />;
 }
