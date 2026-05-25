@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import OnyxLogo from "../../components/shared/OnyxLogo";
 
 const AuthHero = () => {
   return (
@@ -18,14 +18,7 @@ const AuthHero = () => {
 
       {/* Top Left Logo Area */}
       <div className="absolute top-16 left-16 z-20 flex items-center gap-2">
-        <Image
-          src="/images/mpms-logo.png"
-          alt="MPMS Logo"
-          width={120}
-          height={32}
-          priority
-          className="h-8 w-auto object-contain"
-        />
+        <OnyxLogo />
       </div>
 
       {/* Center Text Section */}

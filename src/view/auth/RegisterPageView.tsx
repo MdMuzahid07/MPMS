@@ -4,16 +4,7 @@ import MpmsForm from "@/components/features/form/MpmsForm";
 import MpmsInput from "@/components/features/form/MpmsInput";
 import { useRegisterMutation } from "@/redux/feature/auth/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  KeyRound,
-  Mail,
-  User,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -142,15 +133,18 @@ const RegisterPageView = () => {
         <nav aria-label="Page navigation">
           <Link
             href="/login"
-            className="text-muted-foreground hover:text-primary text-xs font-medium tracking-wide transition-colors"
+            className="group text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
           >
-            <ArrowLeft /> Sign In
+            <span className="inline-block transition-transform group-hover:-translate-x-1">
+              ←
+            </span>{" "}
+            Back to Sign In
           </Link>
         </nav>
 
-        <div className="mx-auto my-auto w-full max-w-104 space-y-6 py-6">
-          <header className="space-y-1.5 text-center">
-            <h1 className="text-foreground text-3xl font-bold tracking-tight">
+        <div className="mx-auto my-auto w-full max-w-112 space-y-7 py-6">
+          <header className="space-y-2 text-left">
+            <h1 className="text-foreground text-3xl font-extrabold tracking-tight">
               Create Account
             </h1>
             <p className="text-muted-foreground text-sm font-light">
@@ -159,7 +153,7 @@ const RegisterPageView = () => {
           </header>
 
           <MpmsForm onSubmit={onSubmit} methods={methods}>
-            <fieldset className="space-y-4" disabled={busy}>
+            <fieldset className="space-y-4.5" disabled={busy}>
               <legend className="sr-only">Account details</legend>
 
               {/* Full name */}
@@ -171,7 +165,7 @@ const RegisterPageView = () => {
                 aria-describedby={errors.name ? "name-error" : undefined}
                 labelIcon={
                   <User
-                    className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                    className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                     aria-hidden="true"
                   />
                 }
@@ -187,7 +181,7 @@ const RegisterPageView = () => {
                 aria-describedby={errors.email ? "email-error" : undefined}
                 labelIcon={
                   <Mail
-                    className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                    className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                     aria-hidden="true"
                   />
                 }
@@ -205,7 +199,7 @@ const RegisterPageView = () => {
                     aria-describedby="password-strength"
                     labelIcon={
                       <KeyRound
-                        className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                        className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                         aria-hidden="true"
                       />
                     }
@@ -219,7 +213,7 @@ const RegisterPageView = () => {
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
-                    className="text-muted-foreground hover:text-primary absolute top-8.5 right-3 transition-colors"
+                    className="text-muted-foreground hover:text-primary absolute top-9 right-3.5 cursor-pointer transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -233,7 +227,7 @@ const RegisterPageView = () => {
                 {passwordValue && (
                   <div
                     id="password-strength"
-                    className="mt-2 space-y-1.5"
+                    className="border-border/40 bg-muted/10 mt-3.5 space-y-2.5 rounded-xl border p-3.5"
                     aria-live="polite"
                     aria-label={`Password strength: ${strengthCfg.label}`}
                   >
@@ -245,12 +239,12 @@ const RegisterPageView = () => {
                           className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
                             i < strengthCfg.bars
                               ? strengthCfg.color
-                              : "bg-muted"
+                              : "bg-muted/50"
                           }`}
                         />
                       ))}
                       {strengthCfg.label && (
-                        <span className="text-muted-foreground ml-1 text-[10px] font-medium">
+                        <span className="text-muted-foreground ml-1 text-[9px] font-bold tracking-wider uppercase">
                           {strengthCfg.label}
                         </span>
                       )}
@@ -258,7 +252,7 @@ const RegisterPageView = () => {
 
                     {/* Rule checklist */}
                     <ul
-                      className="grid grid-cols-2 gap-x-3 gap-y-0.5"
+                      className="grid grid-cols-2 gap-x-3 gap-y-1.5"
                       role="list"
                       aria-label="Password requirements"
                     >
@@ -267,18 +261,21 @@ const RegisterPageView = () => {
                         return (
                           <li
                             key={rule.label}
-                            className={`flex items-center gap-1 text-[10px] transition-colors ${
+                            className={`flex items-center gap-1.5 text-[10px] transition-colors ${
                               passed
-                                ? "text-green-600 dark:text-green-400"
+                                ? "font-medium text-emerald-600 dark:text-emerald-400"
                                 : "text-muted-foreground"
                             }`}
                           >
-                            <Check
-                              className={`h-2.5 w-2.5 shrink-0 transition-opacity ${
-                                passed ? "opacity-100" : "opacity-30"
+                            <span
+                              className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border text-[8px] font-bold transition-all ${
+                                passed
+                                  ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
+                                  : "border-border/60 text-muted-foreground/30"
                               }`}
-                              aria-hidden="true"
-                            />
+                            >
+                              {passed ? "✓" : "•"}
+                            </span>
                             {rule.label}
                           </li>
                         );
@@ -302,7 +299,7 @@ const RegisterPageView = () => {
                   }
                   labelIcon={
                     <KeyRound
-                      className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                      className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                       aria-hidden="true"
                     />
                   }
@@ -316,7 +313,7 @@ const RegisterPageView = () => {
                       ? "Hide confirm password"
                       : "Show confirm password"
                   }
-                  className="text-muted-foreground hover:text-primary absolute top-8.5 right-3 transition-colors"
+                  className="text-muted-foreground hover:text-primary absolute top-9 right-3.5 cursor-pointer transition-colors"
                 >
                   {showConfirm ? (
                     <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -330,7 +327,7 @@ const RegisterPageView = () => {
               <button
                 type="submit"
                 disabled={busy}
-                className="bg-primary text-primary-foreground mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium transition-all duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="group bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 relative mt-4 flex h-11 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={busy ? "Creating account…" : "Create account"}
               >
                 {busy ? (
@@ -340,8 +337,11 @@ const RegisterPageView = () => {
                   />
                 ) : (
                   <>
-                    <span>Create Account</span>
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    <span>Create Workspace Account</span>
+                    <ArrowRight
+                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
                   </>
                 )}
               </button>

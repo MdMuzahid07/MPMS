@@ -1,82 +1,50 @@
 "use client";
 
+import { useGetSprintsQuery } from "@/redux/feature/sprints/sprintsApi";
+import {
+  useGetTasksQuery,
+  useUpdateTaskMutation,
+} from "@/redux/feature/tasks/tasksApi";
+import { useAppSelector } from "@/redux/hooks";
+import { format } from "date-fns";
 import {
   ChevronDown,
   ChevronRight,
   Edit2,
+  ExternalLink,
   MessageSquare,
   Paperclip,
   Play,
   Plus,
-  ExternalLink,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-
-interface Task {
-  id: string;
-  title: string;
-  priority: "High" | "Medium" | "Low";
-  estimate: string;
-  status: "To Do" | "In Progress" | "Review" | "Done";
-  description: string;
-  attachments?: string[];
-  commentsCount?: number;
-}
+import { toast } from "sonner";
 
 export default function MyProjectSprintDetailsView() {
   const params = useParams();
   const router = useRouter();
-  const projectId = params?.id ?? "1";
-  const sprintId = params?.sprintId ?? "1";
+  const projectIdParam = params?.id;
+  const sprintIdParam = params?.sprintId;
+  const projectId = Array.isArray(projectIdParam)
+    ? (projectIdParam[0] ?? "1")
+    : (projectIdParam ?? "1");
+  const sprintId = Array.isArray(sprintIdParam)
+    ? (sprintIdParam[0] ?? "1")
+    : (sprintIdParam ?? "1");
+
+  const { data: sprints } = useGetSprintsQuery(projectId, { skip: !projectId });
+  const activeSprint = sprints?.find((s) => s._id === sprintId);
+
+  const { data: tasksData } = useGetTasksQuery(sprintId, { skip: !sprintId });
+  const [updateTask] = useUpdateTaskMutation();
+  const { user } = useAppSelector((state) => state.auth);
 
   // Manage expandable row item IDs in a state array to allow independent toggles
-  const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({
-    "task-1": false,
-  });
-
+  const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(
+    {},
+  );
   const [priorityFilter, setPriorityFilter] = useState("All Priorities");
-
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "task-1",
-      title: "Implement JWT Rotation Strategy",
-      priority: "High",
-      estimate: "8 hours",
-      status: "In Progress",
-      description:
-        "Requires update to the Redis session store to handle refresh token blacklisting. Ensure that the mobile client receives the new headers correctly on 401 response.",
-      attachments: ["Architecture_Spec_v2.pdf"],
-      commentsCount: 3,
-    },
-    {
-      id: "task-2",
-      title: "Update Swagger Documentation",
-      priority: "Medium",
-      estimate: "4 hours",
-      status: "Review",
-      description:
-        "Adding missing definitions for the `/v2/analytics` payload objects. Standardizing status codes for validation errors across all endpoints.",
-    },
-    {
-      id: "task-3",
-      title: "Fix N+1 Query in Dashboard Feed",
-      priority: "High",
-      estimate: "6 hours",
-      status: "To Do",
-      description:
-        "Refactor ORM calls to use prefetch_related for user avatars and task tags. Current implementation makes 50+ DB calls for a single page load.",
-    },
-    {
-      id: "task-4",
-      title: "Refactor Logger Middleware",
-      priority: "Low",
-      estimate: "2 hours",
-      status: "Done",
-      description:
-        "Migrated from console-based logging to structured JSON logging compatible with Datadog. Added correlation IDs to all request logs.",
-    },
-  ]);
 
   const toggleTaskDetails = (id: string) => {
     setExpandedTasks((prev) => ({
@@ -85,16 +53,38 @@ export default function MyProjectSprintDetailsView() {
     }));
   };
 
-  const handleStatusChange = (id: string, newStatus: Task["status"]) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => (t.id === id ? { ...t, status: newStatus } : t)),
-    );
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    const task = tasksData?.find((t) => t._id === id);
+    if (!task) return;
+
+    if (
+      task.status === "review" &&
+      newStatus === "done" &&
+      user?.role === "member"
+    ) {
+      toast.error("Only managers can approve tasks from Review to Done.");
+      return;
+    }
+
+    try {
+      await updateTask({
+        taskId: id,
+        data: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-ignore
+          status: newStatus as "todo" | "in_progress" | "review" | "done",
+        },
+      }).unwrap();
+      toast.success("Task status updated");
+    } catch {
+      toast.error("Failed to update task status");
+    }
   };
 
-  const filteredTasks = tasks.filter((task) =>
+  const filteredTasks = (tasksData || []).filter((task) =>
     priorityFilter === "All Priorities"
       ? true
-      : task.priority === priorityFilter,
+      : task.priority.toLowerCase() === priorityFilter.toLowerCase(),
   );
 
   return (
@@ -106,19 +96,19 @@ export default function MyProjectSprintDetailsView() {
             <div className="mb-2 flex items-center gap-3">
               <span className="bg-success/10 text-success border-success/20 flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">
                 <span className="bg-success h-1.5 w-1.5 rounded-full" />
-                Active Sprint
+                {activeSprint?.status || "Unknown"} Sprint
               </span>
               <span className="text-on-surface-variant text-xs">
-                Feb 14 — Feb 28, 2024
+                {activeSprint?.startDate && activeSprint?.endDate
+                  ? `${format(new Date(activeSprint.startDate), "MMM d")} — ${format(new Date(activeSprint.endDate), "MMM d, yyyy")}`
+                  : "Date not set"}
               </span>
             </div>
             <h1 className="text-on-surface text-2xl font-bold tracking-tight md:text-3xl">
-              Sprint #12: Core API Refactor
+              {activeSprint?.title || "Sprint Overview"}
             </h1>
             <p className="text-on-surface-variant mt-2 max-w-2xl text-sm leading-relaxed">
-              Focusing on optimizing endpoint latency, implementing structured
-              logging, and resolving critical debt in the authentication
-              middleware layers.
+              Managing current goals, tasks, and velocity for this sprint.
             </p>
           </div>
 
@@ -140,15 +130,22 @@ export default function MyProjectSprintDetailsView() {
             <p className="text-on-surface-variant text-xs font-medium tracking-tighter uppercase">
               Total Tasks
             </p>
-            <p className="text-on-surface mt-1 text-2xl font-bold">24</p>
+            <p className="text-on-surface mt-1 text-2xl font-bold">
+              {tasksData?.length || 0}
+            </p>
           </div>
           <div className="bg-surface-container-low border-outline-variant rounded-xl border p-4">
             <p className="text-on-surface-variant text-xs font-medium tracking-tighter uppercase">
-              Velocity
+              Total Estimate
             </p>
             <div className="mt-1 flex items-end gap-1">
-              <p className="text-on-surface text-2xl font-bold">42</p>
-              <span className="text-on-surface-variant pb-1 text-xs">pts</span>
+              <p className="text-on-surface text-2xl font-bold">
+                {tasksData?.reduce(
+                  (acc, t) => acc + (t.estimateHours || 0),
+                  0,
+                ) || 0}
+              </p>
+              <span className="text-on-surface-variant pb-1 text-xs">hrs</span>
             </div>
           </div>
           <div className="bg-surface-container-low border-outline-variant rounded-xl border p-4">
@@ -202,18 +199,18 @@ export default function MyProjectSprintDetailsView() {
           {/* Task Rows */}
           {filteredTasks.length === 0 ? (
             <div className="text-on-surface-variant p-8 text-center text-sm">
-              No tasks found matches this priority.
+              No tasks found.
             </div>
           ) : (
             filteredTasks.map((task) => {
-              const isExpanded = !!expandedTasks[task.id];
+              const isExpanded = !!expandedTasks[task._id];
               return (
                 <div
-                  key={task.id}
+                  key={task._id}
                   className="group border-outline-variant border-b last:border-0"
                 >
                   <div
-                    onClick={() => toggleTaskDetails(task.id)}
+                    onClick={() => toggleTaskDetails(task._id)}
                     className="hover:bg-surface-container/60 grid cursor-pointer grid-cols-12 items-center gap-4 px-4 py-5 transition-colors md:px-6"
                   >
                     {/* Title Cell */}
@@ -234,18 +231,19 @@ export default function MyProjectSprintDetailsView() {
                     <div className="col-span-4 md:col-span-2">
                       <span
                         className={`flex w-fit items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-bold uppercase ${
-                          task.priority === "High"
+                          task.priority === "high" || task.priority === "urgent"
                             ? "bg-destructive/10 text-destructive border-destructive/20"
-                            : task.priority === "Medium"
+                            : task.priority === "medium"
                               ? "bg-warning/10 text-warning border-warning/20"
                               : "bg-secondary-container/50 text-on-secondary-container border-outline-variant"
                         }`}
                       >
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
-                            task.priority === "High"
+                            task.priority === "high" ||
+                            task.priority === "urgent"
                               ? "bg-destructive"
-                              : task.priority === "Medium"
+                              : task.priority === "medium"
                                 ? "bg-warning"
                                 : "bg-secondary"
                           }`}
@@ -256,7 +254,9 @@ export default function MyProjectSprintDetailsView() {
 
                     {/* Estimation Hours Cell */}
                     <div className="text-on-surface-variant col-span-4 text-xs font-medium md:col-span-2 md:text-sm">
-                      {task.estimate}
+                      {task.estimateHours
+                        ? `${task.estimateHours} hours`
+                        : "--"}
                     </div>
 
                     {/* Status Select Cell */}
@@ -267,17 +267,14 @@ export default function MyProjectSprintDetailsView() {
                       <select
                         value={task.status}
                         onChange={(e) =>
-                          handleStatusChange(
-                            task.id,
-                            e.target.value as Task["status"],
-                          )
+                          handleStatusChange(task._id, e.target.value)
                         }
                         className="bg-surface-container-high text-on-surface focus:ring-primary w-full cursor-pointer rounded border-none px-2.5 py-1 text-xs outline-hidden focus:ring-1"
                       >
-                        <option>To Do</option>
-                        <option>In Progress</option>
-                        <option>Review</option>
-                        <option>Done</option>
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="review">Review</option>
+                        <option value="done">Done</option>
                       </select>
                     </div>
                   </div>
@@ -286,14 +283,18 @@ export default function MyProjectSprintDetailsView() {
                   {isExpanded && (
                     <div className="bg-surface-container/20 text-on-surface-variant animate-in fade-in px-10 pt-1 pb-5 text-sm transition-all duration-200 md:px-14">
                       <div className="max-w-3xl space-y-4">
-                        <p className="leading-relaxed">{task.description}</p>
+                        <p className="leading-relaxed">
+                          {task.description || "No description provided."}
+                        </p>
 
-                        {(task.attachments || task.commentsCount || true) && (
+                        {(task.attachments?.length ||
+                          task.comments?.length ||
+                          true) && (
                           <div className="text-on-surface-variant/80 flex flex-wrap items-center gap-4 pt-3 text-xs">
                             <button
                               onClick={() =>
                                 router.push(
-                                  `/my-projects/${projectId}/sprints/${sprintId}/tasks/${task.id}`,
+                                  `/my-projects/${projectId}/sprints/${sprintId}/tasks/${task._id}`,
                                 )
                               }
                               className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20 flex items-center gap-1.5 rounded border px-3 py-1 font-bold transition-all"
@@ -308,15 +309,17 @@ export default function MyProjectSprintDetailsView() {
                                 className="bg-surface-container-low border-outline-variant/40 flex items-center gap-1 rounded border px-2 py-1"
                               >
                                 <Paperclip className="text-primary h-3.5 w-3.5" />
-                                <span>{file}</span>
+                                <span className="max-w-[150px] truncate">
+                                  {file.split("/").pop()}
+                                </span>
                               </div>
                             ))}
-                            {task.commentsCount !== undefined && (
+                            {task.comments?.length ? (
                               <div className="bg-surface-container-low border-outline-variant/40 flex items-center gap-1 rounded border px-2 py-1">
                                 <MessageSquare className="text-primary h-3.5 w-3.5" />
-                                <span>{task.commentsCount} comments</span>
+                                <span>{task.comments.length} comments</span>
                               </div>
-                            )}
+                            ) : null}
                           </div>
                         )}
                       </div>

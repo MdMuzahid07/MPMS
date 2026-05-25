@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { SettingsIcon } from "@/components/ui/settings";
 import {
   Sidebar,
@@ -13,6 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { SunMoonIcon } from "@/components/ui/sun-moon";
 import type { User } from "@/redux/feature/auth/authSlice";
+import { useGetProjectsQuery } from "@/redux/feature/projects/projectsApi";
 import {
   ArrowRight,
   LogOut,
@@ -22,16 +34,34 @@ import {
   Plus,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import OnyxLogo from "../../../shared/OnyxLogo";
 import {
   type AnimatedIconHandle,
   type DashboardNavItem,
   getDashboardNavItems,
   getUserInitials,
   isActiveNavItem,
+  isAdminRole,
 } from "./dashboard-layout.config";
+
+const PROJECT_COLORS = [
+  "bg-blue-500/75 text-white",
+  "bg-emerald-500/75 text-white",
+  "bg-amber-500/80 text-black",
+  "bg-rose-500/75 text-white",
+  "bg-purple-500/75 text-white",
+];
+
+function getProjectInitials(title: string) {
+  return title
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 type DashboardSidebarProps = {
   user: User | null;
@@ -90,6 +120,12 @@ export function DashboardSidebar({
   const settingsIconRef = useRef<AnimatedIconHandle>(null);
   const [isPinnedOpen, setIsPinnedOpen] = useState(true);
 
+  const { data: projects, isLoading: isProjectsLoading } =
+    useGetProjectsQuery();
+  const isAdmin = isAdminRole(user?.role);
+  const projectBaseRoute = isAdmin ? "/projects" : "/my-projects";
+  const displayProjects = projects?.slice(0, 5) || [];
+
   const handleSidebarMouseEnter = () => {
     if (isMobile || open) {
       return;
@@ -123,21 +159,8 @@ export function DashboardSidebar({
       <SidebarHeader className="border-sidebar-border-b px-3 pt-3 pb-2 group-data-[collapsible=icon]:px-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex h-12 items-center gap-3 rounded-md px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-              <div className="bg-sidebar-primary/14 flex size-10 shrink-0 items-center justify-center rounded-md">
-                <Image
-                  src="/images/mpms-logo.png"
-                  alt="MPMS Logo"
-                  width={30}
-                  height={30}
-                  className="size-7 object-contain"
-                />
-              </div>
-              <div className="grid min-w-0 flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate text-sm font-semibold tracking-tight">
-                  MPMS
-                </span>
-              </div>
+            <div className="flex h-12 items-center justify-between rounded-md px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+              <OnyxLogo className="size-32" />
               <button
                 type="button"
                 onClick={handlePinToggle}
@@ -174,35 +197,67 @@ export function DashboardSidebar({
           <span className="text-sidebar-foreground/45 text-[10px] font-semibold tracking-[0.16em] uppercase">
             Projects
           </span>
-          <Plus className="text-sidebar-foreground/55 size-3.5" />
+          {isAdmin && (
+            <Link href="/projects/new">
+              <Plus className="text-sidebar-foreground/55 hover:text-sidebar-foreground size-3.5 cursor-pointer transition-colors" />
+            </Link>
+          )}
         </div>
 
         <div className="space-y-1 px-1 group-data-[collapsible=icon]:hidden">
-          <button className="hover:bg-sidebar-accent flex h-9 w-full items-center gap-2 rounded-md px-2 text-left transition-colors">
-            <span className="bg-sidebar-primary/75 text-sidebar-primary-foreground flex size-5 items-center justify-center rounded-full text-[9px] font-semibold">
-              WR
-            </span>
-            <span className="flex-1 truncate text-[13px]">
-              Website Redesign
-            </span>
-            <Pin className="text-sidebar-foreground/55 size-3.5" />
-          </button>
-          <button className="hover:bg-sidebar-accent flex h-9 w-full items-center gap-2 rounded-md px-2 text-left transition-colors">
-            <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/75 text-[9px] font-semibold text-white">
-              MA
-            </span>
-            <span className="truncate text-[13px]">Mobile App</span>
-          </button>
-          <button className="hover:bg-sidebar-accent flex h-9 w-full items-center gap-2 rounded-md px-2 text-left transition-colors">
-            <span className="flex size-5 items-center justify-center rounded-full bg-amber-500/80 text-[9px] font-semibold text-black">
-              MC
-            </span>
-            <span className="truncate text-[13px]">Marketing Campaign</span>
-          </button>
-          <button className="hover:bg-sidebar-accent mt-1 flex h-8 w-full items-center justify-between rounded-md px-2 text-left text-[13px] font-medium transition-colors">
+          {isProjectsLoading ? (
+            <div className="space-y-2 px-2 py-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex h-9 items-center gap-2">
+                  <div className="bg-sidebar-accent size-5 animate-pulse rounded-full" />
+                  <div className="bg-sidebar-accent h-3 w-24 animate-pulse rounded-md" />
+                </div>
+              ))}
+            </div>
+          ) : displayProjects.length > 0 ? (
+            displayProjects.map((project, idx) => {
+              const colorClass = PROJECT_COLORS[idx % PROJECT_COLORS.length];
+              const isActive = pathname.startsWith(
+                `${projectBaseRoute}/${project._id}`,
+              );
+
+              return (
+                <Link
+                  key={project._id}
+                  href={`${projectBaseRoute}/${project._id}`}
+                  className={`flex h-9 w-full items-center gap-2 rounded-md px-2 text-left transition-colors ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-foreground"
+                      : "hover:bg-sidebar-accent"
+                  }`}
+                >
+                  <span
+                    className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold ${colorClass}`}
+                  >
+                    {getProjectInitials(project.title)}
+                  </span>
+                  <span className="flex-1 truncate text-[13px]">
+                    {project.title}
+                  </span>
+                  {isActive && (
+                    <Pin className="text-sidebar-foreground/55 size-3.5" />
+                  )}
+                </Link>
+              );
+            })
+          ) : (
+            <div className="text-sidebar-foreground/50 px-2 py-2 text-xs">
+              No active projects
+            </div>
+          )}
+
+          <Link
+            href={projectBaseRoute}
+            className="hover:bg-sidebar-accent text-sidebar-foreground/80 mt-1 flex h-8 w-full items-center justify-between rounded-md px-2 text-left text-[13px] font-medium transition-colors"
+          >
             <span>View all projects</span>
             <ArrowRight className="size-3.5" />
-          </button>
+          </Link>
         </div>
       </SidebarContent>
 
@@ -266,13 +321,34 @@ export function DashboardSidebar({
                     {user.email}
                   </p>
                 </div>
-                <button
-                  onClick={onLogout}
-                  className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground ml-3 rounded-md p-1.5 transition-colors group-data-[collapsible=icon]:hidden"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="size-4" />
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground ml-3 rounded-md p-1.5 transition-colors group-data-[collapsible=icon]:hidden"
+                      aria-label="Sign out"
+                    >
+                      <LogOut className="size-4" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Sign out of MPMS?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will end your current session. You will need to log
+                        in again to access your projects and tasks.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onLogout}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Sign out
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </>

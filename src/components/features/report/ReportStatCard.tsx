@@ -18,7 +18,7 @@ export const ReportStatCard = ({
   tags,
 }: ReportStatCardProps) => {
   return (
-    <article className="group relative overflow-hidden rounded-2xl border p-6 backdrop-blur-xl transition-all duration-300 hover:border-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:border-[0_8px_30px_rgba(255,255,255,0.02)]">
+    <article className="group bg-card relative overflow-hidden rounded-2xl border p-6 transition-all duration-300">
       <div className="from-primary/5 absolute inset-0 bg-linear-to-br via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
       <div className="relative">

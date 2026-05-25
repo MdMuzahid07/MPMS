@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
+  useDeleteTaskMutation,
+  useUpdateTaskMutation,
+} from "@/redux/feature/tasks/tasksApi";
+import { useAppSelector } from "@/redux/hooks";
+import {
   LayoutGrid,
   List,
   RotateCcw,
@@ -11,14 +16,13 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { KanbanBoard } from "./KanbanBoard";
 import type { TaskItem, TaskStatus } from "./task.types";
 import { TaskEditForm } from "./TaskEditForm";
 import { TasksTable } from "./TasksTable";
-import { useDeleteTaskMutation } from "@/redux/feature/tasks/tasksApi";
-import { toast } from "sonner";
 
 interface TaskCanvasProps {
   initialTasks: TaskItem[];
@@ -33,7 +37,9 @@ export const TaskCanvas = ({
   subtitle,
   hideFiltersForMember = false,
 }: TaskCanvasProps) => {
+  const { user } = useAppSelector((state) => state.auth);
   const [deleteTask] = useDeleteTaskMutation();
+  const [updateTask] = useUpdateTaskMutation();
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
 
@@ -103,10 +109,53 @@ export const TaskCanvas = ({
     sprintFilter,
   ]);
 
-  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
+  const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    if (
+      task.status === "Review" &&
+      newStatus === "Done" &&
+      user?.role === "member"
+    ) {
+      toast.error("Only managers can approve tasks from Review to Done.");
+      return;
+    }
+
+    const statusMapReverse: Record<TaskStatus, string> = {
+      "To Do": "todo",
+      Progress: "in_progress",
+      Review: "review",
+      Done: "done",
+    };
+
+    // Optimistic update
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
     );
+
+    try {
+      await updateTask({
+        taskId,
+        data: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-ignore
+          status: statusMapReverse[newStatus] as
+            | "todo"
+            | "in_progress"
+            | "review"
+            | "done",
+        },
+      }).unwrap();
+      toast.success(`Task moved to ${newStatus}`);
+    } catch (err) {
+      // Revert on error
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, status: task.status } : t)),
+      );
+      console.error("Update task status error:", err);
+      toast.error("Failed to update task status.");
+    }
   };
 
   const handleSaveEdit = (updatedTask: TaskItem) => {

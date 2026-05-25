@@ -1,92 +1,65 @@
 "use client";
 
 import { TaskCanvas } from "@/components/features/tasks";
-import type { TaskItem } from "@/components/features/tasks/task.types";
+import type {
+  TaskItem,
+  TaskPriority,
+  TaskStatus,
+} from "@/components/features/tasks/task.types";
+import { useGetAllTasksQuery } from "@/redux/feature/tasks/tasksApi";
 import { useAppSelector } from "@/redux/hooks";
 import { AlertCircle, CheckCircle2, Clock, Flame } from "lucide-react";
 import { useMemo } from "react";
 
-// Seed personalized tasks
-const getPersonalTasks = (userName: string): TaskItem[] => [
-  {
-    id: "user-t1",
-    title: "Refactor API middleware for performance optimization",
-    code: "TASK-802",
-    project: "Quantum Core",
-    sprint: "Sprint 4",
-    assignee: userName,
-    priority: "High",
-    status: "Progress",
-    dueDate: "Oct 24, 2023",
-    projectId: "proj-1",
-    sprintId: "sprint-04",
-    taskId: "task-802",
-  },
-  {
-    id: "user-t2",
-    title: "Design CSS variables for premium dark theme aesthetic",
-    code: "TASK-803",
-    project: "Design System",
-    sprint: "Sprint 4",
-    assignee: userName,
-    priority: "Medium",
-    status: "To Do",
-    dueDate: "Oct 28, 2023",
-    projectId: "proj-4",
-    sprintId: "sprint-04",
-    taskId: "task-803",
-  },
-  {
-    id: "user-t3",
-    title: "Implement visual charts using pure CSS elements",
-    code: "TASK-804",
-    project: "Pulse Analytics",
-    sprint: "Sprint 4",
-    assignee: userName,
-    priority: "Low",
-    status: "Review",
-    dueDate: "Oct 25, 2023",
-    projectId: "proj-2",
-    sprintId: "sprint-04",
-    taskId: "task-804",
-  },
-  {
-    id: "user-t4",
-    title: "Optimize database queries on session preferences lookup",
-    code: "TASK-805",
-    project: "Quantum Core",
-    sprint: "Sprint 4",
-    assignee: userName,
-    priority: "High",
-    status: "Done",
-    dueDate: "Oct 21, 2023",
-    projectId: "proj-1",
-    sprintId: "sprint-04",
-    taskId: "task-805",
-  },
-  {
-    id: "user-t5",
-    title: "OAuth2 authentication token validation logic review",
-    code: "TASK-806",
-    project: "Vortex UI",
-    sprint: "Sprint 3",
-    assignee: userName,
-    priority: "High",
-    status: "To Do",
-    dueDate: "Oct 30, 2023",
-    projectId: "proj-3",
-    sprintId: "sprint-03",
-    taskId: "task-806",
-  },
-];
+const STATUS_MAP: Record<string, TaskStatus> = {
+  todo: "To Do",
+  in_progress: "Progress",
+  review: "Review",
+  done: "Done",
+};
+
+const PRIORITY_MAP: Record<string, TaskPriority> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  urgent: "Urgent",
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  critical: "Urgent",
+};
 
 export default function MyTasksView() {
   const { user } = useAppSelector((state) => state.auth);
   const displayName = user?.name ?? "Team Member";
 
-  const tasks = useMemo(() => {
-    return getPersonalTasks(displayName);
-  }, [displayName]);
+  const { data: tasksData } = useGetAllTasksQuery(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    { assignee: user?._id },
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    { skip: !user?._id },
+  );
+
+  const tasks: TaskItem[] = useMemo(() => {
+    if (!tasksData?.tasks) return [];
+    return tasksData.tasks.map((t) => ({
+      id: t._id,
+      title: t.title,
+      code: `TASK-${t._id.slice(-4).toUpperCase()}`,
+      project: "Assigned Project", // Could fetch project details later if populated
+      sprint: "Active Sprint", // Could fetch sprint details later if populated
+      assignee: displayName,
+      priority: PRIORITY_MAP[t.priority] || "Medium",
+      status: STATUS_MAP[t.status] || "To Do",
+      dueDate: t.dueDate ?? "No due date",
+      projectId: t.projectId,
+      sprintId: t.sprintId,
+      taskId: t._id,
+    }));
+  }, [tasksData, displayName]);
 
   // Compute metrics
   const totalTasks = tasks.length;
@@ -98,7 +71,13 @@ export default function MyTasksView() {
 
   // Urgent items
   const urgentTasks = useMemo(() => {
-    return tasks.filter((t) => t.priority === "High" && t.status !== "Done");
+    return tasks.filter(
+      (t) =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        (t.priority === "High" || t.priority === "Urgent") &&
+        t.status !== "Done",
+    );
   }, [tasks]);
 
   return (
@@ -163,7 +142,7 @@ export default function MyTasksView() {
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               In Progress
             </p>
-            <h3 className="text-foreground text-2xl font-bold text-indigo-400">
+            <h3 className="text-foreground text-2xl font-bold">
               {inProgressTasks}
             </h3>
             <p className="text-muted-foreground text-[10px]">

@@ -9,6 +9,7 @@ import { isAdminRole } from "./dashboard-layout.config";
 type DashboardTopbarProps = {
   pathname: string;
   pageTitle: string;
+  pageHeading: string;
   user: User | null;
   onLogout: () => void;
 };
@@ -16,6 +17,7 @@ type DashboardTopbarProps = {
 export function DashboardTopbar({
   pathname,
   pageTitle,
+  pageHeading,
   user,
 }: DashboardTopbarProps) {
   const { isMobile } = useSidebar();
@@ -29,13 +31,11 @@ export function DashboardTopbar({
           <SidebarTrigger className="text-muted-foreground hover:bg-muted size-8 rounded-md" />
         ) : null}
         <div className="min-w-0">
-          <p className="text-muted-foreground truncate text-[11px] font-medium">
+          <p className="text-muted-foreground truncate text-[11px] font-medium tracking-wide">
             {pageTitle}
           </p>
           <h1 className="text-foreground truncate text-base font-semibold tracking-tight">
-            {user?.role === "member"
-              ? "Personal Workspace"
-              : "Operations Workspace"}
+            {pageHeading}
           </h1>
         </div>
       </div>

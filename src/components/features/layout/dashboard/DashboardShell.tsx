@@ -10,7 +10,7 @@ import React, { useEffect } from "react";
 import { DashboardAccessRestricted } from "./DashboardAccessRestricted";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardTopbar } from "./DashboardTopbar";
-import { getDashboardPageTitle } from "./dashboard-layout.config";
+import { getDashboardPageDetails } from "./dashboard-layout.config";
 
 type DashboardShellProps = {
   children: React.ReactNode;
@@ -37,7 +37,10 @@ export function DashboardShell({
   pathname,
   user,
 }: DashboardShellProps) {
-  const pageTitle = getDashboardPageTitle(pathname);
+  const { label: pageTitle, heading: pageHeading } = getDashboardPageDetails(
+    pathname,
+    user?.role,
+  );
 
   return (
     <SidebarProvider
@@ -51,6 +54,7 @@ export function DashboardShell({
           onLogout={onLogout}
           pathname={pathname}
           pageTitle={pageTitle}
+          pageHeading={pageHeading}
           user={user}
         />
 

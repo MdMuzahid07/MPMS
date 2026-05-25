@@ -7,13 +7,13 @@ import { useLoginMutation } from "@/redux/feature/auth/authApi";
 import { setCredentials } from "@/redux/feature/auth/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Eye, EyeOff, KeyRound, Mail } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+import OnyxLogo from "../../components/shared/OnyxLogo";
 import { LoginFormValues, loginSchema } from "./auth.schema";
 import AuthHero from "./AuthHero";
 
@@ -125,27 +125,23 @@ const LoginPageView = () => {
         <nav aria-label="Page navigation">
           <Link
             href="/"
-            className="text-muted-foreground hover:text-primary text-xs font-medium tracking-wide transition-colors"
+            className="group text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
           >
-            ← Back to Home
+            <span className="inline-block transition-transform group-hover:-translate-x-1">
+              ←
+            </span>{" "}
+            Back to Home
           </Link>
         </nav>
 
-        <div className="mx-auto my-auto w-full max-w-104 space-y-6 py-6">
+        <div className="mx-auto my-auto w-full max-w-112 space-y-7 py-6">
           {/* Logo — visible only on mobile (AuthHero carries it on desktop) */}
           <div className="mb-6 flex justify-center lg:hidden">
-            <Image
-              src="/images/mpms-logo.png"
-              alt="MPMS"
-              width={150}
-              height={40}
-              priority
-              className="h-10 w-auto object-contain"
-            />
+            <OnyxLogo />
           </div>
 
-          <header className="space-y-1.5 text-center">
-            <h1 className="text-foreground text-3xl font-bold tracking-tight">
+          <header className="space-y-2 text-left">
+            <h1 className="text-foreground text-3xl font-extrabold tracking-tight">
               Sign In
             </h1>
             <p className="text-muted-foreground text-sm font-light">
@@ -154,7 +150,7 @@ const LoginPageView = () => {
           </header>
 
           <MpmsForm onSubmit={onSubmit} methods={methods}>
-            <fieldset className="space-y-4" disabled={busy}>
+            <fieldset className="space-y-4.5" disabled={busy}>
               <legend className="sr-only">Account credentials</legend>
 
               <MpmsInput
@@ -165,7 +161,7 @@ const LoginPageView = () => {
                 aria-describedby={errors.email ? "email-error" : undefined}
                 labelIcon={
                   <Mail
-                    className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                    className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                     aria-hidden="true"
                   />
                 }
@@ -184,7 +180,7 @@ const LoginPageView = () => {
                   }
                   labelIcon={
                     <KeyRound
-                      className="text-muted-foreground mr-1 inline h-3.5 w-3.5"
+                      className="text-muted-foreground mr-1.5 inline h-3.5 w-3.5"
                       aria-hidden="true"
                     />
                   }
@@ -194,7 +190,7 @@ const LoginPageView = () => {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="text-muted-foreground hover:text-primary absolute top-8.5 right-3 transition-colors"
+                  className="text-muted-foreground hover:text-primary absolute top-9 right-3.5 cursor-pointer transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -209,7 +205,7 @@ const LoginPageView = () => {
                 <MpmsCheckbox name="rememberMe" label="Keep me signed in" />
                 <Link
                   href="/forgot-password"
-                  className="text-muted-foreground hover:text-primary text-xs transition-colors"
+                  className="text-muted-foreground hover:text-primary text-xs font-medium transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -219,7 +215,7 @@ const LoginPageView = () => {
               <button
                 type="submit"
                 disabled={busy}
-                className="bg-primary text-primary-foreground mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium transition-all duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="group bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 relative mt-4 flex h-11 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={busy ? "Signing in…" : "Sign in"}
               >
                 {busy ? (
@@ -229,8 +225,11 @@ const LoginPageView = () => {
                   />
                 ) : (
                   <>
-                    <span>Sign In</span>
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    <span>Sign In to Workspace</span>
+                    <ArrowRight
+                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
                   </>
                 )}
               </button>
@@ -239,35 +238,39 @@ const LoginPageView = () => {
 
           <section
             aria-label="Demo accounts"
-            className="border-border bg-muted/30 space-y-3 rounded-lg border-dashed p-4"
+            className="bg-muted/15 border-border/40 space-y-3.5 rounded-2xl border p-5"
           >
-            <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-              Demo accounts for testing
-            </p>
-            <ul className="grid grid-cols-1 gap-2" role="list">
+            <div className="flex items-center justify-between">
+              <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                Quick Test Accounts
+              </p>
+              <span className="text-primary/70 animate-pulse text-[10px] font-semibold">
+                Click to Autofill
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
               {DEMO_ACCOUNTS.map(({ label, email, password, badge }) => (
-                <li key={email}>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickSelect(email, password)}
-                    className="border-border bg-card hover:bg-muted/50 hover:border-primary group flex w-full items-center justify-between rounded border px-3 py-2 text-left text-xs transition-colors"
-                    aria-label={`Load demo credentials for ${label}`}
-                  >
-                    <div>
-                      <span className="text-foreground block font-semibold">
-                        {label}
-                      </span>
-                      <span className="text-muted-foreground text-[10px]">
-                        {email}
-                      </span>
-                    </div>
-                    <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wide uppercase">
+                <button
+                  key={email}
+                  type="button"
+                  onClick={() => handleQuickSelect(email, password)}
+                  className="border-border/50 bg-card hover:bg-primary/[0.02] hover:border-primary/45 group flex cursor-pointer flex-col justify-between rounded-xl border p-3 text-left shadow-xs transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                  aria-label={`Load demo credentials for ${label}`}
+                >
+                  <div className="w-full">
+                    <span className="text-foreground block w-full truncate text-xs font-bold">
                       {badge}
                     </span>
-                  </button>
-                </li>
+                    <span className="text-muted-foreground mt-0.5 block w-full truncate text-[10px]">
+                      {email.split("@")[0]}
+                    </span>
+                  </div>
+                  <span className="text-primary/95 bg-primary/5 group-hover:bg-primary group-hover:text-primary-foreground border-primary/10 mt-3.5 rounded-md border px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase transition-colors duration-200">
+                    Autofill
+                  </span>
+                </button>
               ))}
-            </ul>
+            </div>
           </section>
 
           <p className="text-muted-foreground text-center text-xs">

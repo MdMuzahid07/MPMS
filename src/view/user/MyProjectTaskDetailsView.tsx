@@ -3,70 +3,114 @@
 /* eslint-disable @next/next/no-img-element */
 
 import {
+  useCreateCommentMutation,
+  useGetActivityLogsQuery,
+  useGetCommentsQuery,
+  useGetTaskByIdQuery,
+} from "@/redux/feature/tasks/tasksApi";
+import { format, formatDistanceToNow } from "date-fns";
+import {
   AlertCircle,
   AtSign,
   CornerDownRight,
-  Edit3,
   FileDown,
   FileText,
-  FolderArchive,
   MessageSquare,
   MoreVertical,
   Paperclip,
-  Plus,
   PlusCircle,
   RefreshCw,
   Smile,
-  ThumbsUp,
-  UserPlus,
 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+interface CommentItem {
+  _id: string;
+  author: { name: string; avatar?: string };
+  createdAt: string;
+  body: string;
+}
 
-interface Comment {
-  id: string;
-  author: string;
-  avatar: string;
-  timestamp: string;
-  content: string;
-  likes: number;
-  hasLiked?: boolean;
+interface AttachmentItem {
+  filename: string;
+  url: string;
+  uploadedAt: string;
+}
+
+interface ActivityLogItem {
+  _id: string;
+  user: { name: string };
+  action: string;
+  createdAt: string;
 }
 
 export default function MyProjectTaskDetailsView() {
+  const params = useParams();
+  const taskId = (params?.taskId as string) || "1";
+
+  const { data: task, isLoading: isTaskLoading } = useGetTaskByIdQuery(taskId, {
+    skip: !taskId,
+  });
+  const { data: commentsData } = useGetCommentsQuery(taskId, {
+    skip: !taskId,
+  });
+  const { data: activityLogs } = useGetActivityLogsQuery(taskId, {
+    skip: !taskId,
+  });
+  const [createComment, { isLoading: isCommenting }] =
+    useCreateCommentMutation();
+  useCreateCommentMutation();
+
   // State for adding a top-level comment
   const [newComment, setNewComment] = useState("");
   // State for a nested reply frame
   const [nestedReply, setNestedReply] = useState("");
-
-  // Local active comment track
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: "c-1",
-      author: "Alex Rivers",
-      avatar:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuCK8Bn-I5wiuSwk3EVrZaA3zNs3tjqhViNunK6V6ihQ_qmIG8nvrdGdUtAiNcrg_jQwBfiV_iVq-WHstmJJwQ92ssILsEcdfNV5Dz2nTUQyyzD1E70ADvBjPBK_yIh179V4lL6ruLLIzG76-07bWDrGu_nrMIIKprLWK-8E_DK8ksFgHgacDWZaFGkknLP8aIHWJ6TsBrJZKJWK4qvZNxmD-oFpIZET_NYc8euI0fmlT0iBKW11OnqpLVS0c5xhK8sXBYXT9_Sm0Wfh",
-      timestamp: "2 hours ago",
-      content:
-        "I've started the initial benchmarking. The bottleneck is definitely in the `verifySession` hook. It's hitting the Postgres DB for user preferences every single time.",
-      likes: 3,
-      hasLiked: false,
-    },
-  ]);
-
-  const handleLike = (id: string) => {
-    setComments((prev) =>
-      prev.map((c) => {
-        if (c.id === id) {
-          return {
-            ...c,
-            likes: c.hasLiked ? c.likes - 1 : c.likes + 1,
-            hasLiked: !c.hasLiked,
-          };
-        }
-        return c;
-      }),
-    );
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return;
+    try {
+      await createComment({
+        taskId,
+        data: { body: newComment },
+      }).unwrap();
+      setNewComment("");
+      toast.success("Comment added");
+    } catch {
+      toast.error("Failed to add comment");
+    }
   };
+
+  const handleReplySubmit = async (parentId: string) => {
+    if (!nestedReply.trim()) return;
+    try {
+      await createComment({
+        taskId,
+        data: { body: nestedReply, parentComment: parentId },
+      }).unwrap();
+      setNestedReply("");
+      setReplyingTo(null);
+      toast.success("Reply added");
+    } catch {
+      toast.error("Failed to add reply");
+    }
+  };
+
+  if (isTaskLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!task) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p className="text-muted-foreground">Task not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="text-on-surface container mx-auto min-h-screen">
@@ -78,19 +122,16 @@ export default function MyProjectTaskDetailsView() {
             <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-start">
               <div>
                 <h1 className="text-on-surface mb-3 text-xl font-bold tracking-tight md:text-3xl">
-                  Refactor API middleware for performance optimization
+                  {task.title}
                 </h1>
                 <div className="flex flex-wrap gap-2">
-                  <span className="bg-success/10 text-success border-success/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold">
+                  <span className="bg-success/10 text-success border-success/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase">
                     <span className="bg-success h-1.5 w-1.5 rounded-full" />
-                    In Progress
+                    {task.status.replace("_", " ")}
                   </span>
-                  <span className="bg-destructive/10 text-destructive border-destructive/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold">
+                  <span className="bg-destructive/10 text-destructive border-destructive/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase">
                     <span className="bg-destructive h-1.5 w-1.5 rounded-full" />
-                    High Priority
-                  </span>
-                  <span className="bg-surface-container-high text-on-surface-variant border-outline-variant rounded-full border px-3 py-1 text-xs font-medium">
-                    Backend
+                    {task.priority} Priority
                   </span>
                 </div>
               </div>
@@ -105,21 +146,32 @@ export default function MyProjectTaskDetailsView() {
               </div>
             </div>
 
-            {/* Meta Assignments Grid */}
             <div className="border-outline-variant/30 grid grid-cols-2 gap-4 border-y py-6 md:grid-cols-4">
               <div>
                 <p className="text-text-muted mb-1.5 text-[11px] font-bold tracking-wider uppercase">
                   Assignee
                 </p>
                 <div className="flex items-center gap-2">
-                  <img
-                    className="ring-outline-variant h-6 w-6 rounded-full ring-1"
-                    alt="Alex Rivers"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDq_EzAq-smo93c5spQ7oxkHceQc_TzJh-Hdl0-zec4Eb9Hzx2O3tPMtAI1VOiES0snaG_3X_CHu2NrNuNhE8Rhypacv2b2R9OM53Kis_pGSB5FHnKbA3L_I_rwIscjNbhwA3faIKqt80QnGZaL_eA_0AXejdE-hKW90RC8vb4YWWhtpgqXU0rEXNfP0KUzVGdgAmJpG_9K_K-TSSMmwyM4hlWs9n7zpJbPWggP7Z2KXAZiED_-bZIXd7MJhRLzfzXMKmhHhbgx7wo"
-                  />
-                  <span className="text-on-surface text-sm font-medium">
-                    Alex Rivers
-                  </span>
+                  {task.assignees?.[0] ? (
+                    <>
+                      <img
+                        className="ring-outline-variant h-6 w-6 rounded-full object-cover ring-1"
+                        alt={task.assignees[0].name}
+                        src={
+                          task.assignees[0].avatar ||
+                          "https://ui-avatars.com/api/?name=" +
+                            task.assignees[0].name
+                        }
+                      />
+                      <span className="text-on-surface text-sm font-medium">
+                        {task.assignees[0].name}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-on-surface text-sm font-medium">
+                      Unassigned
+                    </span>
+                  )}
                 </div>
               </div>
               <div>
@@ -127,14 +179,42 @@ export default function MyProjectTaskDetailsView() {
                   Reporter
                 </p>
                 <div className="flex items-center gap-2">
-                  <img
-                    className="ring-outline-variant h-6 w-6 rounded-full ring-1"
-                    alt="Sarah Chen"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4UJcTexpe7ZGNpgNQIT5skooLfjOD-H_E_JLO4zrTPPw3KYfr2gwUl1iCjD_ddvVzy0Lw0bMZESTn--F2wlWtIjcMeNTtHQSiJ8b0EPUIfG6Kkdrxfx5_s8BxFTNtKCr6zuEQuFXFoeDFOvoeMa2hbAFmHFllXB10f3-C6Yy3Gplps1G40t9QjG64kJ8AtFGq0z8v3j0TVDIBpagVDo-WZVdQ4ig_1m7AjwxNJpruRSJForVTySO8NDXdzjBqDQRFdYFRvxqCJiQJ"
-                  />
-                  <span className="text-on-surface text-sm font-medium">
-                    Sarah Chen
-                  </span>
+                  {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    task.reporter ? (
+                      <>
+                        <img
+                          className="ring-outline-variant h-6 w-6 rounded-full object-cover ring-1"
+                          alt={
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-ignore
+                            task.reporter.name
+                          }
+                          src={
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-ignore
+                            task.reporter.avatar ||
+                            "https://ui-avatars.com/api/?name=" +
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-ignore
+                              task.reporter.name
+                          }
+                        />
+                        <span className="text-on-surface text-sm font-medium">
+                          {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-ignore
+                            task.reporter.name
+                          }
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-on-surface text-sm font-medium">
+                        Unknown
+                      </span>
+                    )
+                  }
                 </div>
               </div>
               <div>
@@ -142,7 +222,9 @@ export default function MyProjectTaskDetailsView() {
                   Due Date
                 </p>
                 <p className="text-on-surface text-sm font-semibold">
-                  Oct 24, 2023
+                  {task.dueDate
+                    ? format(new Date(task.dueDate), "MMM dd, yyyy")
+                    : "No due date"}
                 </p>
               </div>
               <div>
@@ -150,7 +232,17 @@ export default function MyProjectTaskDetailsView() {
                   Estimation
                 </p>
                 <p className="text-primary text-sm font-semibold">
-                  12 Story Points
+                  {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    task.estimate
+                      ? `${
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-ignore
+                          task.estimate
+                        } hours`
+                      : "Not estimated"
+                  }
                 </p>
               </div>
             </div>
@@ -161,24 +253,7 @@ export default function MyProjectTaskDetailsView() {
                 Description
               </h3>
               <div className="text-on-surface-variant max-w-3xl space-y-4 text-sm leading-relaxed md:text-base">
-                <p>
-                  We need to address the bottleneck in the authentication layer.
-                  Current middleware implementation performs redundant database
-                  lookups on every sub-request within the same session context.
-                </p>
-                <p className="text-on-surface font-medium">
-                  Goals for this refactor:
-                </p>
-                <ul className="text-on-surface/80 list-disc space-y-2 pl-5">
-                  <li>
-                    Implement Redis-based session caching for frequent metadata.
-                  </li>
-                  <li>Reduce latency by approximately 45ms per request.</li>
-                  <li>
-                    Simplify the error handling logic to ensure standardized
-                    responses.
-                  </li>
-                </ul>
+                <p>{task.description || "No description provided."}</p>
               </div>
             </div>
           </div>
@@ -196,101 +271,93 @@ export default function MyProjectTaskDetailsView() {
             </div>
 
             <div className="space-y-8 p-6 md:p-8">
-              {comments.map((comment) => (
-                <div key={comment.id} className="flex gap-4">
-                  <img
-                    className="ring-outline-variant h-10 w-10 shrink-0 rounded-full object-cover ring-1"
-                    alt={comment.author}
-                    src={comment.avatar}
-                  />
-                  <div className="flex-grow">
-                    <div className="mb-1 flex items-center gap-3">
-                      <span className="text-on-surface text-sm font-bold">
-                        {comment.author}
-                      </span>
-                      <span className="text-text-muted text-xs">
-                        {comment.timestamp}
-                      </span>
-                    </div>
-                    <p className="text-on-surface-variant mb-3 text-sm leading-relaxed">
-                      {comment.content}
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <button className="text-primary text-xs font-bold transition-all hover:underline">
-                        Reply
-                      </button>
-                      <button
-                        onClick={() => handleLike(comment.id)}
-                        className={`hover:bg-surface-container flex items-center gap-1.5 rounded-md px-2 py-1 text-xs transition-colors ${
-                          comment.hasLiked
-                            ? "text-primary font-bold"
-                            : "text-text-muted hover:text-on-surface"
-                        }`}
-                      >
-                        <ThumbsUp
-                          className={`h-3.5 w-3.5 ${comment.hasLiked ? "fill-current" : ""}`}
-                        />
-                        <span>{comment.likes}</span>
-                      </button>
-                    </div>
-
-                    {/* Nested Reply UI Trace */}
-                    <div className="border-outline-variant mt-6 space-y-6 border-l-2 pl-4">
-                      <div className="flex gap-4">
-                        <img
-                          className="h-8 w-8 shrink-0 rounded-full object-cover"
-                          alt="Mark J."
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmGWm-kSozVV5aUdtJlF4rcNveysMwZRhH0PuRzReQbUpGA8uwd0yc4qSRyHUr6s99HgsIH8JHaerghv619xXqOBC6D_HEiWY30NUc8d0a1d3an-eYXRWmiZgTTDfFZv-DOXNn0hZ_PHNm2DB87wrgh377f_AYRbxz3_tk5w45JSieVEZJek_801-NxHLFYqyzXFfRxuv34VSYsoU7ibAIDB5g4NaxfMlvsm_eOiIA4RCpoYN_8h_OYyCZ3kVavOk_hcIDgHZSydgc"
-                        />
-                        <div className="flex-grow">
-                          <div className="mb-1 flex items-center gap-3">
-                            <span className="text-on-surface text-sm font-bold">
-                              Mark J.
-                            </span>
-                            <span className="text-text-muted text-xs">
-                              1 hour ago
-                            </span>
-                          </div>
-                          <p className="text-on-surface-variant mb-2 text-sm leading-relaxed">
-                            Have we considered using a LRU cache instead of
-                            Redis for the user preference part? It&apos;s
-                            relatively static data.
-                          </p>
-                          <button className="text-primary text-xs font-bold transition-all hover:underline">
-                            Reply
-                          </button>
-                        </div>
+              {((commentsData as CommentItem[]) || []).map(
+                (comment: CommentItem) => (
+                  <div key={comment._id} className="flex gap-4">
+                    <img
+                      className="ring-outline-variant h-10 w-10 shrink-0 rounded-full object-cover ring-1"
+                      alt={comment.author?.name || "User"}
+                      src={
+                        comment.author?.avatar ||
+                        "https://ui-avatars.com/api/?name=" +
+                          (comment.author?.name || "User")
+                      }
+                    />
+                    <div className="flex-grow">
+                      <div className="mb-1 flex items-center gap-3">
+                        <span className="text-on-surface text-sm font-bold">
+                          {comment.author?.name || "Unknown User"}
+                        </span>
+                        <span className="text-text-muted text-xs">
+                          {formatDistanceToNow(new Date(comment.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </span>
                       </div>
+                      <p className="text-on-surface-variant mb-3 text-sm leading-relaxed whitespace-pre-wrap">
+                        {comment.body}
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() =>
+                            setReplyingTo(
+                              replyingTo === comment._id ? null : comment._id,
+                            )
+                          }
+                          className="text-primary text-xs font-bold transition-all hover:underline"
+                        >
+                          Reply
+                        </button>
+                      </div>
+
+                      {/* Nested Replies Rendering could go here if parentComment is populated */}
 
                       {/* Active Nested Thread Sub-Input Frame */}
-                      <div className="flex gap-3 pt-2">
-                        <div className="bg-primary-container/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-                          <CornerDownRight className="h-4 w-4" />
-                        </div>
-                        <div className="flex-grow">
-                          <textarea
-                            value={nestedReply}
-                            onChange={(e) => setNestedReply(e.target.value)}
-                            className="bg-background border-border focus:ring-primary focus:border-primary text-on-surface placeholder:text-text-muted min-h-[80px] w-full resize-none rounded-lg border p-3 text-sm outline-hidden focus:ring-1"
-                            placeholder="Write a reply..."
-                          />
-                          <div className="mt-2 flex justify-end gap-2">
-                            <button
-                              onClick={() => setNestedReply("")}
-                              className="text-on-surface-variant hover:text-on-surface px-3 py-1.5 text-xs font-semibold transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button className="bg-primary text-on-primary rounded-md px-3 py-1.5 text-xs font-bold transition-all hover:brightness-105 active:scale-95">
-                              Post Reply
-                            </button>
+                      {replyingTo === comment._id && (
+                        <div className="border-outline-variant mt-6 space-y-6 border-l-2 pl-4">
+                          <div className="flex gap-3 pt-2">
+                            <div className="bg-primary-container/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                              <CornerDownRight className="h-4 w-4" />
+                            </div>
+                            <div className="flex-grow">
+                              <textarea
+                                value={nestedReply}
+                                onChange={(e) => setNestedReply(e.target.value)}
+                                className="bg-background border-border focus:ring-primary focus:border-primary text-on-surface placeholder:text-text-muted min-h-[80px] w-full resize-none rounded-lg border p-3 text-sm outline-hidden focus:ring-1"
+                                placeholder="Write a reply..."
+                              />
+                              <div className="mt-2 flex justify-end gap-2">
+                                <button
+                                  onClick={() => {
+                                    setNestedReply("");
+                                    setReplyingTo(null);
+                                  }}
+                                  className="text-on-surface-variant hover:text-on-surface px-3 py-1.5 text-xs font-semibold transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={() => handleReplySubmit(comment._id)}
+                                  disabled={isCommenting}
+                                  className="bg-primary text-on-primary rounded-md px-3 py-1.5 text-xs font-bold transition-all hover:brightness-105 active:scale-95 disabled:opacity-50"
+                                >
+                                  Post Reply
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
+                ),
+              )}
+              {(!commentsData ||
+                (commentsData as CommentItem[]).length === 0) && (
+                <div className="text-on-surface-variant text-center text-sm">
+                  No comments yet. Be the first to start the discussion!
                 </div>
-              ))}
+              )}
 
               {/* Core Top Level Input Engine */}
               <div className="border-border flex gap-4 border-t pt-6">
@@ -322,7 +389,11 @@ export default function MyProjectTaskDetailsView() {
                           <Smile className="h-4 w-4" />
                         </button>
                       </div>
-                      <button className="bg-primary text-on-primary border-primary/5 rounded-lg border px-5 py-2 text-xs font-bold transition-all hover:brightness-105 active:scale-95">
+                      <button
+                        onClick={handleCommentSubmit}
+                        disabled={isCommenting}
+                        className="bg-primary text-on-primary border-primary/5 rounded-lg border px-5 py-2 text-xs font-bold transition-all hover:brightness-105 active:scale-95 disabled:opacity-50"
+                      >
                         Comment
                       </button>
                     </div>
@@ -345,33 +416,30 @@ export default function MyProjectTaskDetailsView() {
                 <span className="text-text-muted text-sm font-medium">
                   Status
                 </span>
-                <span className="text-on-surface text-sm font-semibold">
-                  In Progress
+                <span className="text-on-surface text-sm font-semibold uppercase">
+                  {task.status.replace("_", " ")}
                 </span>
               </div>
               <div className="border-outline-variant/20 flex items-center justify-between border-b pb-3">
                 <span className="text-text-muted text-sm font-medium">
                   Priority
                 </span>
-                <span className="text-destructive flex items-center gap-1.5 text-sm font-semibold">
+                <span className="text-destructive flex items-center gap-1.5 text-sm font-semibold uppercase">
                   <AlertCircle className="text-destructive h-4 w-4" />
-                  High
+                  {task.priority}
                 </span>
               </div>
               <div className="border-outline-variant/20 flex items-center justify-between border-b pb-3">
                 <span className="text-text-muted text-sm font-medium">
-                  Component
-                </span>
-                <span className="text-on-surface text-sm font-semibold">
-                  Authentication
-                </span>
-              </div>
-              <div className="flex items-center justify-between pb-1">
-                <span className="text-text-muted text-sm font-medium">
                   Sub-tasks
                 </span>
-                <span className="bg-surface-container-high text-primary rounded-md px-2 py-0.5 text-xs font-bold">
-                  4 / 9 Done
+                <span className="text-on-surface text-sm font-semibold">
+                  {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    task.subtasks?.length || 0
+                  }{" "}
+                  Total
                 </span>
               </div>
             </div>
@@ -389,59 +457,41 @@ export default function MyProjectTaskDetailsView() {
             </div>
 
             <div className="space-y-3">
-              {/* Image Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
-                <div className="bg-surface-container-highest text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                  <FileText className="h-5 w-5" />
+              {// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              //@ts-ignore
+              task.attachments?.map((att: AttachmentItem, idx: number) => (
+                <div
+                  key={idx}
+                  className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all"
+                >
+                  <div className="bg-surface-container-highest text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-grow">
+                    <p className="text-on-surface truncate text-sm font-semibold">
+                      {att.filename}
+                    </p>
+                    <p className="text-text-muted text-xs">
+                      {formatDistanceToNow(new Date(att.uploadedAt), {
+                        addSuffix: true,
+                      })}
+                    </p>
+                  </div>
+                  <a
+                    href={att.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg p-2 transition-colors"
+                  >
+                    <FileDown className="h-4 w-4" />
+                  </a>
                 </div>
-                <div className="min-w-0 flex-grow">
-                  <p className="text-on-surface truncate text-sm font-semibold">
-                    ui_mockup_v1.png
-                  </p>
-                  <p className="text-text-muted text-xs">
-                    2.4 MB • Oct 22, 2023
-                  </p>
-                </div>
-                <button className="text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg p-2 transition-colors">
-                  <FileDown className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* PDF Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
-                <div className="bg-surface-container-highest text-error flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-grow">
-                  <p className="text-on-surface truncate text-sm font-semibold">
-                    specification_doc.pdf
-                  </p>
-                  <p className="text-text-muted text-xs">
-                    840 KB • Oct 21, 2023
-                  </p>
-                </div>
-                <button className="text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg p-2 transition-colors">
-                  <FileDown className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Archive Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
-                <div className="bg-surface-container-highest text-warning flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                  <FolderArchive className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-grow">
-                  <p className="text-on-surface truncate text-sm font-semibold">
-                    assets_bundle.zip
-                  </p>
-                  <p className="text-text-muted text-xs">
-                    15.2 MB • Oct 20, 2023
-                  </p>
-                </div>
-                <button className="text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg p-2 transition-colors">
-                  <FileDown className="h-4 w-4" />
-                </button>
-              </div>
+              ))}
+              {(!task.attachments || task.attachments.length === 0) && (
+                <p className="text-on-surface-variant text-center text-sm">
+                  No attachments yet.
+                </p>
+              )}
             </div>
           </div>
 
@@ -454,71 +504,39 @@ export default function MyProjectTaskDetailsView() {
             </div>
 
             <div className="custom-scrollbar flex-grow space-y-6 overflow-y-auto p-6">
-              {/* Log Item 1 */}
-              <div className="relative flex gap-4">
-                <div className="bg-outline-variant absolute top-[24px] bottom-[-28px] left-[11px] w-[1px]" />
-                <div className="bg-primary/20 border-primary/40 text-primary z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
-                  <RefreshCw className="h-3 w-3" />
+              {((activityLogs as ActivityLogItem[]) || []).map(
+                (log: ActivityLogItem, idx: number) => (
+                  <div key={idx} className="relative flex gap-4">
+                    {idx !==
+                      ((activityLogs as ActivityLogItem[])?.length || 0) -
+                        1 && (
+                      <div className="bg-outline-variant absolute top-[24px] bottom-[-28px] left-[11px] w-[1px]" />
+                    )}
+                    <div className="bg-primary/20 border-primary/40 text-primary z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
+                      <RefreshCw className="h-3 w-3" />
+                    </div>
+                    <div className="pb-1">
+                      <p className="text-on-surface text-sm">
+                        <span className="font-bold">
+                          {log.user?.name || "System"}
+                        </span>{" "}
+                        {log.action}
+                      </p>
+                      <p className="text-text-muted mt-1 text-xs">
+                        {formatDistanceToNow(new Date(log.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ),
+              )}
+              {(!activityLogs ||
+                (activityLogs as ActivityLogItem[]).length === 0) && (
+                <div className="text-on-surface-variant text-center text-sm">
+                  No activity recorded yet.
                 </div>
-                <div className="pb-1">
-                  <p className="text-on-surface text-sm">
-                    <span className="font-bold">Alex Rivers</span> changed
-                    status to{" "}
-                    <span className="text-success font-semibold">
-                      In Progress
-                    </span>
-                  </p>
-                  <p className="text-text-muted mt-1 text-xs">10 minutes ago</p>
-                </div>
-              </div>
-
-              {/* Log Item 2 */}
-              <div className="relative flex gap-4">
-                <div className="bg-outline-variant absolute top-[24px] bottom-[-28px] left-[11px] w-[1px]" />
-                <div className="bg-tertiary/20 border-tertiary/40 text-tertiary z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
-                  <Edit3 className="h-3 w-3" />
-                </div>
-                <div className="pb-1">
-                  <p className="text-on-surface text-sm">
-                    <span className="font-bold">Sarah Chen</span> updated the
-                    task description
-                  </p>
-                  <p className="text-text-muted mt-1 text-xs">2 hours ago</p>
-                </div>
-              </div>
-
-              {/* Log Item 3 */}
-              <div className="relative flex gap-4">
-                <div className="bg-outline-variant absolute top-[24px] bottom-[-28px] left-[11px] w-[1px]" />
-                <div className="bg-surface-container-high border-outline-variant text-on-surface-variant z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
-                  <Plus className="h-3 w-3" />
-                </div>
-                <div className="pb-1">
-                  <p className="text-on-surface text-sm">
-                    <span className="font-bold">System</span> added attachment:{" "}
-                    <span className="text-primary cursor-pointer font-medium hover:underline">
-                      benchmark_v1.json
-                    </span>
-                  </p>
-                  <p className="text-text-muted mt-1 text-xs">4 hours ago</p>
-                </div>
-              </div>
-
-              {/* Log Item 4 */}
-              <div className="relative flex gap-4">
-                <div className="bg-primary/20 border-primary/40 text-primary z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
-                  <UserPlus className="h-3 w-3" />
-                </div>
-                <div className="pb-1">
-                  <p className="text-on-surface text-sm">
-                    <span className="font-bold">Sarah Chen</span> assigned task
-                    to Alex Rivers
-                  </p>
-                  <p className="text-text-muted mt-1 text-xs">
-                    Yesterday at 4:32 PM
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="border-border bg-surface-container-low/40 border-t p-4 text-center">

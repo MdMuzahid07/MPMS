@@ -1,8 +1,15 @@
 "use client";
 
 import { Bolt, CheckCircle2, ChevronRight, Clock } from "lucide-react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  useGetProjectByIdQuery,
+  useGetProjectStatsQuery,
+} from "@/redux/feature/projects/projectsApi";
+import { useGetSprintsQuery } from "@/redux/feature/sprints/sprintsApi";
+import { format } from "date-fns";
 
 interface SprintItem {
   id: string;
@@ -16,42 +23,67 @@ interface SprintItem {
 export default function MyProjectDetailsView() {
   const params = useParams();
   const router = useRouter();
-  const projectId = params?.id ?? "1";
+  const projectId = (params?.id as string) ?? "1";
+
+  const { data: project, isLoading: projectLoading } = useGetProjectByIdQuery(
+    projectId,
+    { skip: !projectId },
+  );
+  const { data: sprintsData, isLoading: sprintsLoading } = useGetSprintsQuery(
+    projectId,
+    { skip: !projectId },
+  );
+  const { data: stats, isLoading: statsLoading } = useGetProjectStatsQuery(
+    projectId,
+    { skip: !projectId },
+  );
 
   // Client state to safely handle micro-interaction on hydration mount
   const [progressWidth, setProgressWidth] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgressWidth(68), 200);
-    return () => clearTimeout(timer);
-  }, []);
+    if (stats) {
+      const timer = setTimeout(
+        () => setProgressWidth(stats.percentComplete),
+        200,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [stats]);
 
-  const sprints: SprintItem[] = [
-    {
-      id: "sprint-4",
-      title: "Sprint 04: Component Library Polish",
-      dateRange: "Sept 12 - Sept 26",
-      status: "Active",
-      progress: 82,
-      team: ["/profile/picture/3", "/profile/picture/4"],
-    },
-    {
-      id: "sprint-3",
-      title: "Sprint 03: Architecture Validation",
-      dateRange: "Aug 28 - Sept 11",
-      status: "Completed",
-      progress: 100,
-      team: ["/profile/picture/5"],
-    },
-    {
-      id: "sprint-5",
-      title: "Sprint 05: API Integration & Testing",
-      dateRange: "Sept 27 - Oct 11",
-      status: "Upcoming",
-      progress: 0,
-      team: [],
-    },
-  ];
+  if (projectLoading || sprintsLoading || statsLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p className="text-muted-foreground">Project not found.</p>
+      </div>
+    );
+  }
+
+  const sprints: SprintItem[] = (sprintsData || []).map((s) => {
+    let uiStatus: SprintItem["status"] = "Upcoming";
+    if (s.status === "active") uiStatus = "Active";
+    if (s.status === "completed") uiStatus = "Completed";
+
+    return {
+      id: s._id,
+      title: s.title,
+      dateRange: `${format(new Date(s.startDate), "MMM d")} - ${format(
+        new Date(s.endDate),
+        "MMM d",
+      )}`,
+      status: uiStatus,
+      progress: uiStatus === "Completed" ? 100 : uiStatus === "Active" ? 50 : 0, // Mocked progress for sprint
+      team: project.members.slice(0, 3).map((m) => m.avatar || ""),
+    };
+  });
 
   return (
     <div className="relative container mx-auto space-y-10 p-4 md:p-8">
@@ -61,24 +93,21 @@ export default function MyProjectDetailsView() {
         <div className="bg-card border-border col-span-12 flex flex-col justify-between rounded-xl border p-6 md:p-8 lg:col-span-8">
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-3">
-              <span className="bg-primary/10 border-primary/20 text-primary flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
+              <span className="bg-primary/10 border-primary/20 text-primary flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase">
                 <span className="bg-primary h-1.5 w-1.5 rounded-full" />
-                IN PROGRESS
+                {project.status.replace("_", " ")}
               </span>
               <span className="text-muted-foreground text-xs font-medium">
-                • Project ID: PRJ-2024-082
+                • Project ID: PRJ-{project._id.slice(-6).toUpperCase()}
               </span>
             </div>
 
             <h1 className="text-foreground mb-4 text-2xl font-bold tracking-tight md:text-3xl">
-              Technical Dark Mode System Design
+              {project.title}
             </h1>
 
             <p className="text-muted-foreground mb-6 max-w-2xl text-sm leading-relaxed md:text-base">
-              Designing and implementing a high-performance design system for
-              developer tools. Focusing on speed, information density, and the
-              &apos;Procedural Midnight&apos; aesthetic for professional
-              software engineering platforms.
+              {project.description}
             </p>
           </div>
 
@@ -88,7 +117,7 @@ export default function MyProjectDetailsView() {
                 Client
               </p>
               <p className="text-foreground text-sm font-semibold">
-                Aether Corp.
+                {project.client}
               </p>
             </div>
             <div>
@@ -96,9 +125,22 @@ export default function MyProjectDetailsView() {
                 Lead
               </p>
               <div className="flex items-center gap-2">
-                <div className="border-border h-5 w-5 shrink-0 overflow-hidden rounded-full border bg-neutral-800" />
+                <div className="border-border relative h-5 w-5 shrink-0 overflow-hidden rounded-full border bg-neutral-800">
+                  {typeof project.createdBy === "object" &&
+                    project.createdBy.avatar && (
+                      <Image
+                        src={project.createdBy.avatar}
+                        alt="Lead"
+                        fill
+                        className="object-cover"
+                        sizes="20px"
+                      />
+                    )}
+                </div>
                 <p className="text-foreground text-sm font-semibold">
-                  Marcus V.
+                  {typeof project.createdBy === "object"
+                    ? project.createdBy.name
+                    : "Unknown Lead"}
                 </p>
               </div>
             </div>
@@ -107,7 +149,7 @@ export default function MyProjectDetailsView() {
                 Deadline
               </p>
               <p className="text-foreground text-sm font-semibold">
-                Oct 24, 2024
+                {format(new Date(project.endDate), "MMM dd, yyyy")}
               </p>
             </div>
             <div>
@@ -115,7 +157,11 @@ export default function MyProjectDetailsView() {
                 Budget
               </p>
               <p className="text-foreground text-sm font-semibold">
-                $42,500.00
+                $
+                {project.budget.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
           </div>
@@ -151,13 +197,17 @@ export default function MyProjectDetailsView() {
                     <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider">
                       OPEN TASKS
                     </p>
-                    <p className="text-foreground text-xl font-bold">14</p>
+                    <p className="text-foreground text-xl font-bold">
+                      {stats?.remaining || 0}
+                    </p>
                   </div>
                   <div className="bg-background border-border rounded-lg border p-4">
                     <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider">
                       COMPLETED
                     </p>
-                    <p className="text-xl font-bold text-emerald-400">32</p>
+                    <p className="text-xl font-bold text-emerald-400">
+                      {stats?.completedTasks || 0}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -217,24 +267,24 @@ export default function MyProjectDetailsView() {
               {/* Stacked Face Avatars Placeholder */}
               <div className="flex shrink-0 -space-x-2">
                 {sprint.team.length > 0
-                  ? sprint.team.map((_, index) => (
+                  ? sprint.team.map((avatar, index) => (
                       <div
                         key={index}
-                        className="border-card h-8 w-8 rounded-full border-2 bg-neutral-800"
-                      />
+                        className="border-card relative h-8 w-8 overflow-hidden rounded-full border-2 bg-neutral-800"
+                      >
+                        {avatar ? (
+                          <Image
+                            src={avatar}
+                            alt="member"
+                            fill
+                            className="object-cover"
+                            sizes="32px"
+                          />
+                        ) : null}
+                      </div>
                     ))
                   : null}
-                {sprint.id === "sprint-4" && (
-                  <div className="bg-background border-card text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-bold">
-                    +3
-                  </div>
-                )}
-                {sprint.id === "sprint-3" && (
-                  <div className="bg-background border-card text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-bold">
-                    +1
-                  </div>
-                )}
-                {sprint.status === "Upcoming" && (
+                {sprint.team.length === 0 && sprint.status === "Upcoming" && (
                   <div className="bg-background border-card text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-bold">
                     --
                   </div>
