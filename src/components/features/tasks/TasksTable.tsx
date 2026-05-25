@@ -26,7 +26,7 @@ export const TasksTable = ({
     <div className="overflow-x-auto">
       <table className="w-full min-w-255 border-collapse">
         <thead className="bg-muted/35">
-          <tr className="border-border border-b">
+          <tr className="border-border-b">
             <th className="w-12 px-3 py-3 text-left">
               <input
                 type="checkbox"

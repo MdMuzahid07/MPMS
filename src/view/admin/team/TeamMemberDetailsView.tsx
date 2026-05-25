@@ -20,7 +20,7 @@ export default function TeamMemberDetailsView({
     return (
       <div className="animate-in fade-in mx-auto w-full max-w-4xl space-y-4 pb-8 duration-200">
         <Skeleton className="h-4 w-48" />
-        <section className="bg-card space-y-6 rounded-lg border p-6 shadow-sm">
+        <section className="bg-card space-y-6 rounded-lg border p-6">
           <div className="flex justify-between">
             <div className="space-y-2">
               <Skeleton className="h-8 w-64" />
@@ -59,7 +59,7 @@ export default function TeamMemberDetailsView({
       <div className="text-muted-foreground text-xs">
         Team / Member / <span className="text-foreground">{member.name}</span>
       </div>
-      <section className="bg-card rounded-lg border p-6 shadow-sm">
+      <section className="bg-card rounded-lg border p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">

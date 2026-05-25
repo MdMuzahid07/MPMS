@@ -9,6 +9,7 @@ import {
   useGetOverviewReportQuery,
   useGetProjectsReportQuery,
 } from "@/redux/feature/reports/reportsApi";
+import { InfoBanner } from "@/components/shared/InfoBanner";
 import {
   Bolt,
   BriefcaseBusiness,
@@ -155,6 +156,8 @@ export default function DashboardView() {
           <VelocityTrend />
         </aside>
       </section>
+
+      <InfoBanner />
     </div>
   );
 }

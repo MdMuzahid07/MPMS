@@ -107,7 +107,7 @@ export function CreateProjectForm() {
       <div className="mt-8 w-full space-y-6 overflow-hidden lg:grid lg:grid-cols-3 lg:gap-8 lg:space-y-0">
         {/* Left Column: General Information */}
         <div className="space-y-8 lg:col-span-2">
-          <div className="border-border/50 bg-card rounded-xl border p-6 shadow-sm">
+          <div className="border-border/50 bg-card rounded-xl border p-6">
             <h3 className="text-foreground mb-6 text-lg font-semibold tracking-tight">
               General Information
             </h3>
@@ -159,7 +159,7 @@ export function CreateProjectForm() {
 
         {/* Right Column: Timeline & Assets */}
         <div className="space-y-6">
-          <div className="border-border/50 bg-card rounded-xl border p-6 shadow-sm">
+          <div className="border-border/50 bg-card rounded-xl border p-6">
             <h3 className="text-foreground mb-6 text-lg font-semibold tracking-tight">
               Timeline
             </h3>
@@ -174,7 +174,7 @@ export function CreateProjectForm() {
             </div>
           </div>
 
-          <div className="border-border/50 bg-card rounded-xl border p-6 shadow-sm">
+          <div className="border-border/50 bg-card rounded-xl border p-6">
             <h3 className="text-foreground mb-6 text-lg font-semibold tracking-tight">
               Project Assets
             </h3>
@@ -203,7 +203,7 @@ export function CreateProjectForm() {
                       <button
                         type="button"
                         onClick={removeThumbnail}
-                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full p-2 shadow-sm transition-transform hover:scale-105"
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full border p-2 transition-transform hover:scale-105"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -254,7 +254,7 @@ export function CreateProjectForm() {
           <Button
             type="submit"
             disabled={isLoading || isUploading}
-            className="w-full px-6 text-xs font-semibold shadow-sm sm:w-auto"
+            className="w-full border px-6 text-xs font-semibold sm:w-auto"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Project

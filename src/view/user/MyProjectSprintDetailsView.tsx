@@ -127,7 +127,7 @@ export default function MyProjectSprintDetailsView() {
               <Edit2 className="h-4 w-4" />
               Edit Sprint
             </button>
-            <button className="bg-primary text-on-primary-container inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold shadow-xs transition-all hover:brightness-110 active:scale-95">
+            <button className="bg-primary text-on-primary-container inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition-all hover:brightness-110 active:scale-95">
               <Play className="h-4 w-4 fill-current" />
               Complete Sprint
             </button>
@@ -162,7 +162,7 @@ export default function MyProjectSprintDetailsView() {
               Sprint Health
             </p>
             <div className="bg-surface-variant mt-3 h-1.5 w-full overflow-hidden rounded-full">
-              <div className="bg-accent-linear-lime h-full w-[65%] rounded-full shadow-[0_0_8px_rgba(228,242,34,0.4)]" />
+              <div className="bg-accent-linear-lime h-full w-[65%] rounded-full border-[0_0_8px_rgba(228,242,34,0.4)]" />
             </div>
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function MyProjectSprintDetailsView() {
         </div>
 
         {/* Expandable Task List Table */}
-        <div className="border-outline-variant bg-surface-container-lowest overflow-hidden rounded-xl border shadow-xs">
+        <div className="border-outline-variant bg-surface-container-lowest overflow-hidden rounded-xl border">
           {/* Task Table Header */}
           <div className="border-outline-variant bg-surface-container-low text-on-surface-variant grid hidden grid-cols-12 gap-4 border-b px-6 py-4 text-xs font-bold tracking-wider uppercase md:grid">
             <div className="col-span-6">Task Title</div>
@@ -330,9 +330,9 @@ export default function MyProjectSprintDetailsView() {
       </section>
 
       {/* Floating Action Button */}
-      <button className="bg-primary text-on-primary-container group fixed right-8 bottom-8 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95">
+      <button className="bg-primary text-on-primary-container group fixed right-8 bottom-8 z-50 flex h-14 w-14 items-center justify-center rounded-full border transition-all hover:scale-105 active:scale-95">
         <Plus className="h-6 w-6 transition-transform group-hover:rotate-90" />
-        <span className="bg-surface-container-high text-on-surface border-outline-variant pointer-events-none absolute right-16 rounded-lg border px-3 py-1.5 text-xs font-semibold whitespace-nowrap opacity-0 shadow-md transition-all duration-200 group-hover:opacity-100">
+        <span className="bg-surface-container-high text-on-surface border-outline-variant pointer-events-none absolute right-16 rounded-lg border px-3 py-1.5 text-xs font-semibold whitespace-nowrap opacity-0 transition-all duration-200 group-hover:opacity-100">
           Create Task
         </span>
       </button>

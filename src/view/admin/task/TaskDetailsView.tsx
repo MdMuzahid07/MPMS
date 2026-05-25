@@ -360,7 +360,7 @@ export default function TaskDetailsView({
                 ))}
               </div>
             ) : (
-              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center">
+              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border-dashed p-8 text-center">
                 <ClipboardList className="text-muted-foreground/40 mb-2 h-8 w-8" />
                 <p className="text-muted-foreground text-sm font-medium italic">
                   No subtasks defined for this task.
@@ -569,7 +569,7 @@ export default function TaskDetailsView({
                 ))}
               </div>
             ) : (
-              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border-dashed p-6 text-center">
                 <Paperclip className="text-muted-foreground/30 mb-1 h-6 w-6" />
                 <p className="text-muted-foreground text-xs font-medium italic">
                   No attachments uploaded.
@@ -606,7 +606,7 @@ export default function TaskDetailsView({
                 })}
               </div>
             ) : (
-              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+              <div className="border-border/60 flex flex-col items-center justify-center rounded-xl border-dashed p-6 text-center">
                 <CheckCircle className="text-muted-foreground/30 mb-1 h-5 w-5" />
                 <p className="text-muted-foreground text-xs font-medium italic">
                   No activities logged yet.

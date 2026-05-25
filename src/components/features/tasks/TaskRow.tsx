@@ -22,7 +22,7 @@ export const TaskRow = ({
   onDelete,
 }: TaskRowProps) => {
   return (
-    <tr className="border-border border-b">
+    <tr className="border-border-b">
       <td className="px-3 py-3.5">
         <Checkbox
           checked={isSelected}

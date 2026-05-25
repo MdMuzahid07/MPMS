@@ -1,4 +1,3 @@
-export * from "./InfoBanner";
 export * from "./PageHeader";
 export * from "./ProgressTrendChart";
 export * from "./report.types";

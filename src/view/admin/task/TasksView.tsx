@@ -11,6 +11,8 @@ import type {
 import { useGetAllTasksQuery } from "@/redux/feature/tasks/tasksApi";
 import { Loader2, ShieldAlert } from "lucide-react";
 
+import { InfoBanner } from "@/components/shared/InfoBanner";
+
 // Map backend status to TaskCanvas frontend type
 const mapStatusToFrontend = (status: string): TaskStatus => {
   switch (status) {
@@ -55,7 +57,7 @@ export const TasksView = () => {
 
   if (error || !data) {
     return (
-      <div className="border-border bg-card mx-auto mt-12 flex max-w-lg flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
+      <div className="border-border bg-card mx-auto mt-12 flex max-w-lg flex-col items-center justify-center rounded-xl border-dashed p-12 text-center">
         <ShieldAlert className="text-destructive mb-4 size-12" />
         <h2 className="text-foreground mb-2 text-xl font-bold">
           Failed to Load Tasks
@@ -99,6 +101,7 @@ export const TasksView = () => {
         title="Tasks / All Items"
         subtitle="Manage, search, group, and coordinate tasks across your organization's projects."
       />
+      <InfoBanner message="This page displays a centralized view of all tasks across projects. Use it to track status, identify blockers, and reassign priorities." />
     </div>
   );
 };

@@ -17,7 +17,7 @@ interface FocusSectionProps {
 
 export const FocusSection = ({ items }: FocusSectionProps) => {
   return (
-    <div className="border-border bg-card rounded-md border p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xl font-semibold tracking-tight">
           Management Focus

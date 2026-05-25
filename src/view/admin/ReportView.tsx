@@ -1,82 +1,118 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  InfoBanner,
   PageHeader,
   ReportStatCard,
   SprintProgressSection,
   TeamPerformanceTable,
   TeamReportItem,
 } from "@/components/features/report";
-
-const TEAM_REPORT_ROWS: TeamReportItem[] = [
-  {
-    id: "1",
-    name: "Marcus Thorne",
-    role: "Senior Backend",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAzqzcFNW9tG1r4jChfW05tFWsarScd6TSQBrlhVamuGO8X_vVkxT82TomyAtW7lB7ixY2PAKwjTzLrtnS-DyuDcFXkExaqitB3zC2XogTEOnubjY8PwnBZc-g50q84tuwJEorQqdVgHqlv0sItzeCKQc2FoZlR52K5EeZXHKxHzogsyWler-_O9Sr-GmooNG1wYVYCWfNJLno2COPwX6jt_yLxvhJAqX5fGFQdl9tnb56CXSvQKWkiAhl1stnQLmamwnL_7EWhZuQ6",
-    completion: 92,
-    score: 4.8,
-    status: "Peak",
-  },
-  {
-    id: "2",
-    name: "Sarah Jenkins",
-    role: "Lead Designer",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCX5P28pGOPSrfMPRxrqgsA5o9T2Eyk7JYqJQRGpHkh0lcq0e_NTqb23KgwYnbiBE45pO6Es-LuPHGQP_KKOH0Ce-hagGX2bytEomUu-B56veNjwSEGvyt8kLJ8ymJbXc7iek5FFlCKc4UXACq6Lm0uNaEYOe8x-gqD26hBnPpUQzi62ExVtYiaCyxp6YrKpnCg5txWsZBsWNrsp4postkKhXwJuKcqLPBMbLWUuWlAQPWUaEPyND4btuIpzRkFXe6JzpRDHp_enTnk",
-    completion: 88,
-    score: 4.5,
-    status: "Active",
-  },
-  {
-    id: "3",
-    name: "Elias Vance",
-    role: "DevOps Engineer",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAWvC2ZxBqppJXjYHHq4q8exBnTAlQ1F-u53yA3TMzNJJ1Eny1EkJRJ0SsHvVNR3OLWTMZNt-WAsxOxlDirBULHaEA19x-Lxpt8ckDf28yxvxOr_c5QIdTDXcGjPq2H-XZ6XoOSdnPwba_XADHJ3-GZhWL9dON-EOtdn_aprxCdrAsowaStiifQCGQZLrYQ04uGOtTHqYOr28cM4GLxI1lufLRWKnGDehTimaTP9PXE856vv6VpPn1RWBPK4Yb3wzga84SEtLRB8vfj",
-    completion: 41,
-    score: 3.2,
-    status: "Delayed",
-  },
-];
+import { InfoBanner } from "@/components/shared/InfoBanner";
+import {
+  useGetOverviewReportQuery,
+  useGetUsersReportQuery,
+} from "@/redux/feature/reports/reportsApi";
+import { Loader2, ShieldAlert } from "lucide-react";
 
 export interface ReportViewProps {
-  teamMembers?: TeamReportItem[];
   onExportCSV?: () => void;
   onDownloadReport?: () => void;
 }
 
 export const ReportView = ({
-  teamMembers = TEAM_REPORT_ROWS,
   onExportCSV,
   onDownloadReport,
 }: ReportViewProps) => {
+  const {
+    data: overview,
+    isLoading: isOverviewLoading,
+    error: overviewError,
+  } = useGetOverviewReportQuery();
+  const {
+    data: usersReport,
+    isLoading: isUsersLoading,
+    error: usersError,
+  } = useGetUsersReportQuery();
+
+  if (isOverviewLoading || isUsersLoading) {
+    return (
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (overviewError || usersError) {
+    return (
+      <div className="border-border bg-card mx-auto mt-12 flex max-w-lg flex-col items-center justify-center rounded-xl border-dashed p-12 text-center">
+        <ShieldAlert className="text-destructive mb-4 size-12" />
+        <h2 className="text-foreground mb-2 text-xl font-bold">
+          Failed to Load Reports
+        </h2>
+        <p className="text-muted-foreground mb-6 text-sm">
+          There was an error retrieving report data from the server. Please try
+          refreshing.
+        </p>
+      </div>
+    );
+  }
+
+  // Calculate global progress
+  const totalTasks =
+    (overview?.completedTasks || 0) + (overview?.openTasks || 0);
+  const globalProgressValue =
+    totalTasks > 0
+      ? Math.round(((overview?.completedTasks || 0) / totalTasks) * 100)
+      : 0;
+
   const stats = {
     globalProgress: {
-      value: "74.2%",
-      footer: "+2.4% increase from last audit",
+      value: `${globalProgressValue}%`,
+      footer: "Based on overall task completion",
     },
     tasksRemaining: {
-      value: "128",
+      value: (overview?.openTasks || 0).toString(),
       footer: "Active across all projects",
       tags: [
         {
-          text: "12 OVERDUE",
-          tone: "border-rose-500/25 bg-rose-500/12 text-rose-600 dark:text-rose-300",
-        },
-        {
-          text: "14 CRITICAL",
-          tone: "border-amber-500/25 bg-amber-500/12 text-amber-600 dark:text-amber-300",
+          text: `${overview?.activeSprints || 0} ACTIVE SPRINTS`,
+          tone: "border-indigo-500/25 bg-indigo-500/12 text-indigo-600 dark:text-indigo-300",
         },
       ],
     },
-    timeLogged: { value: "1,240h", footer: "Avg. 38.5h per member" },
+    timeLogged: {
+      value: `${overview?.totalHoursLogged || 0}h`,
+      footer:
+        overview?.totalUsers && overview.totalUsers > 0
+          ? `Avg. ${Math.round((overview.totalHoursLogged || 0) / overview.totalUsers)}h per member`
+          : "No active members",
+    },
   };
 
+  const rawUsersReport = Array.isArray(usersReport) ? usersReport : [];
+
+  const teamMembers: TeamReportItem[] = rawUsersReport.map(
+    (userReport: any, index: number) => {
+      return {
+        id: userReport.user?._id || `fallback-user-${index}`,
+        name: userReport.user?.name || "Unknown User",
+        role: userReport.user?.role || "Member",
+        avatar: userReport.user?.avatar || "",
+        completion: Math.round(userReport.completionRate) || 0,
+        score: 5.0, // Backend might not provide a score, fallback to 5.0
+        status:
+          userReport.completionRate >= 80
+            ? "Peak"
+            : userReport.completionRate >= 50
+              ? "Active"
+              : "Delayed",
+      } as TeamReportItem;
+    },
+  );
+
   return (
-    <div className="w-full space-y-5 pb-8">
+    <div className="animate-in fade-in slide-in-from-bottom-4 w-full space-y-5 pb-8 duration-500">
       <PageHeader title="Reports / Overview" subtitle="Operations Workspace" />
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,7 +128,7 @@ export const ReportView = ({
           tags={stats.tasksRemaining.tags}
         />
         <ReportStatCard
-          title="Time Logged (This Week)"
+          title="Time Logged (All Time)"
           value={stats.timeLogged.value}
           footer={stats.timeLogged.footer}
         />

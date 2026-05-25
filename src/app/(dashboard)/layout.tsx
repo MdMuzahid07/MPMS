@@ -59,6 +59,16 @@ export default function DashboardLayout({
     }
   }, [token, router]);
 
+  useEffect(() => {
+    if (user && user.role === "member" && isAdministrativePath(pathname)) {
+      if (pathname === "/") {
+        router.replace("/my-projects");
+      } else {
+        router.replace("/unauthorized");
+      }
+    }
+  }, [user, pathname, router]);
+
   const handleLogout = async () => {
     try {
       await triggerLogout().unwrap();

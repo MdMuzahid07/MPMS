@@ -101,7 +101,7 @@ export const AddMemberDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="bg-popover rounded-xl border p-6 shadow-2xl sm:max-w-md">
+      <DialogContent className="bg-popover rounded-xl border p-6 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base font-bold">
             <Users className="text-primary size-4.5" />
@@ -160,7 +160,7 @@ export const AddMemberDialog = ({
               render={({ field }) => (
                 <div className="space-y-2">
                   <Label>Skills (Press Enter to add)</Label>
-                  <div className="bg-background border-input flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border px-2 py-1.5 shadow-sm">
+                  <div className="bg-background border-input flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border px-2 py-1.5">
                     {field.value.map((skill, index) => (
                       <Badge
                         key={index}
@@ -188,7 +188,7 @@ export const AddMemberDialog = ({
                           ? "React, Golang, Kubernetes"
                           : ""
                       }
-                      className="h-7 min-w-30 flex-1 border-0 px-1 py-0 text-sm shadow-none focus-visible:ring-0"
+                      className="h-7 min-w-30 flex-1 border-0 border-none px-1 py-0 text-sm focus-visible:ring-0"
                       value={skillInput}
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => {

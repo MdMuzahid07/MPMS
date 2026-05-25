@@ -4,7 +4,7 @@ const VELOCITY_BARS = [26, 41, 33, 52, 37, 68];
 
 export const VelocityTrend = () => {
   return (
-    <div className="border-border bg-card rounded-md border p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <p className="text-muted-foreground text-[10px] font-semibold tracking-[0.12em] uppercase">
         Velocity Trend
       </p>

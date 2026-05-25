@@ -161,7 +161,7 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
     <MpmsForm<UpdateProjectDto> onSubmit={onSubmit} methods={methods}>
       <div className="mt-6 grid w-full gap-6 overflow-hidden lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <section className="border-border/60 bg-card rounded-xl border p-5 shadow-sm">
+          <section className="border-border/60 bg-card rounded-xl border p-5">
             <h2 className="mb-5 text-lg font-semibold tracking-tight">
               General Information
             </h2>
@@ -208,7 +208,7 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
         </div>
 
         <div className="space-y-6">
-          <section className="border-border/60 bg-card rounded-xl border p-5 shadow-sm">
+          <section className="border-border/60 bg-card rounded-xl border p-5">
             <h2 className="mb-5 text-lg font-semibold tracking-tight">
               Timeline
             </h2>
@@ -222,7 +222,7 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
             </div>
           </section>
 
-          <section className="border-border/60 bg-card rounded-xl border p-5 shadow-sm">
+          <section className="border-border/60 bg-card rounded-xl border p-5">
             <h2 className="mb-5 text-lg font-semibold tracking-tight">
               Project Assets
             </h2>
@@ -251,7 +251,7 @@ export function ProjectEditForm({ projectId }: ProjectEditFormProps) {
                       <button
                         type="button"
                         onClick={removeThumbnail}
-                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full p-2 shadow-sm transition-transform hover:scale-105"
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full border p-2 transition-transform hover:scale-105"
                       >
                         <X className="h-4 w-4" />
                       </button>

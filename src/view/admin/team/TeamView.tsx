@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { DeleteConfirmationModal } from "@/components/features/tasks/DeleteConfirmationModal";
+import { InfoBanner } from "@/components/shared/InfoBanner";
 import {
   AddMemberDialog,
   TeamEmptyState,
@@ -315,6 +316,8 @@ export const TeamView = () => {
         confirmLabel="Delete permanently"
         onConfirm={confirmDeleteMember}
       />
+
+      <InfoBanner message="This page is strictly for managing organizational roles, system access, and user profile data." />
     </div>
   );
 };

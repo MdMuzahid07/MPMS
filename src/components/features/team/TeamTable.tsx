@@ -18,7 +18,7 @@ export const TeamTable = ({
     <div className="overflow-x-auto">
       <table className="w-full min-w-245 border-collapse">
         <thead className="bg-muted/35">
-          <tr className="border-border border-b">
+          <tr className="border-border-b">
             <th className="text-muted-foreground px-5 py-3 text-left text-[10px] font-semibold tracking-[0.14em] uppercase">
               Member
             </th>

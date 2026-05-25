@@ -230,7 +230,7 @@ export const TaskCanvas = ({
                 className={cn(
                   "flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-all",
                   viewMode === "board"
-                    ? "bg-primary text-primary-foreground hover:bg-primary shadow-sm"
+                    ? "bg-primary text-primary-foreground hover:bg-primary border"
                     : "text-muted-foreground hover:text-foreground hover:bg-transparent",
                 )}
               >
@@ -244,7 +244,7 @@ export const TaskCanvas = ({
                 className={cn(
                   "flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-all",
                   viewMode === "list"
-                    ? "bg-primary text-primary-foreground hover:bg-primary shadow-sm"
+                    ? "bg-primary text-primary-foreground hover:bg-primary border"
                     : "text-muted-foreground hover:text-foreground hover:bg-transparent",
                 )}
               >

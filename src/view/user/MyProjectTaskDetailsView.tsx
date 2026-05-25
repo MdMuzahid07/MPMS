@@ -322,7 +322,7 @@ export default function MyProjectTaskDetailsView() {
                           <Smile className="h-4 w-4" />
                         </button>
                       </div>
-                      <button className="bg-primary text-on-primary shadow-primary/5 rounded-lg px-5 py-2 text-xs font-bold shadow-md transition-all hover:brightness-105 active:scale-95">
+                      <button className="bg-primary text-on-primary border-primary/5 rounded-lg border px-5 py-2 text-xs font-bold transition-all hover:brightness-105 active:scale-95">
                         Comment
                       </button>
                     </div>
@@ -390,7 +390,7 @@ export default function MyProjectTaskDetailsView() {
 
             <div className="space-y-3">
               {/* Image Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border border-transparent p-2.5 transition-all">
+              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
                 <div className="bg-surface-container-highest text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                   <FileText className="h-5 w-5" />
                 </div>
@@ -408,7 +408,7 @@ export default function MyProjectTaskDetailsView() {
               </div>
 
               {/* PDF Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border border-transparent p-2.5 transition-all">
+              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
                 <div className="bg-surface-container-highest text-error flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                   <FileText className="h-5 w-5" />
                 </div>
@@ -426,7 +426,7 @@ export default function MyProjectTaskDetailsView() {
               </div>
 
               {/* Archive Item */}
-              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border border-transparent p-2.5 transition-all">
+              <div className="group hover:bg-surface-container-high/60 hover:border-outline-variant flex items-center gap-3 rounded-xl border-transparent p-2.5 transition-all">
                 <div className="bg-surface-container-highest text-warning flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                   <FolderArchive className="h-5 w-5" />
                 </div>

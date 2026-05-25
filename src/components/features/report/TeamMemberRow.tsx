@@ -31,7 +31,7 @@ export const TeamMemberRow = ({ member }: TeamMemberRowProps) => {
   };
 
   return (
-    <tr className="border-border border-b">
+    <tr className="border-border-b">
       <td className="px-3 py-3">
         <div className="flex items-center gap-2.5">
           <Avatar className="border-border size-8 rounded-md border">

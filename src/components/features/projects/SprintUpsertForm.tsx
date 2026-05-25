@@ -124,7 +124,7 @@ function SprintMilestonesField() {
           <button
             type="button"
             onClick={addMilestone}
-            className="text-muted-foreground hover:bg-muted border-border flex h-10 w-full items-center gap-2 rounded-md border border-dashed px-3 text-sm transition-colors"
+            className="text-muted-foreground hover:bg-muted border-border flex h-10 w-full items-center gap-2 rounded-md border-dashed px-3 text-sm transition-colors"
           >
             <Plus className="size-3.5" />
             Add milestone

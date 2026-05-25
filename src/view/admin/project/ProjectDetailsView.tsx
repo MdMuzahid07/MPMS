@@ -4,6 +4,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InfoBanner } from "@/components/shared/InfoBanner";
 import {
   useGetProjectByIdQuery,
   useGetProjectStatsQuery,
@@ -221,7 +222,7 @@ export default function ProjectDetailsView({
 
           <div className="grid gap-4 sm:grid-cols-2">
             {sprints.length === 0 ? (
-              <div className="border-border/60 bg-card/20 text-muted-foreground col-span-full flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed text-center">
+              <div className="border-border/60 bg-card/20 text-muted-foreground col-span-full flex h-40 flex-col items-center justify-center rounded-2xl border-dashed text-center">
                 <CircleDashed className="mb-2.5 size-7 animate-spin opacity-30" />
                 <p className="text-sm font-semibold">
                   No active sprints planned yet
@@ -284,6 +285,7 @@ export default function ProjectDetailsView({
           </article>
         </div>
       </div>
+      <InfoBanner message="This page displays comprehensive details of a specific project, including sprint cycles, task completion status, and overall budget allocation." />
     </div>
   );
 }

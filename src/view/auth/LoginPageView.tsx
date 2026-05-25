@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { loginSchema, LoginFormValues } from "./auth.schema";
+import { LoginFormValues, loginSchema } from "./auth.schema";
 import AuthHero from "./AuthHero";
 
 const DEMO_ACCOUNTS = [
@@ -26,8 +26,8 @@ const DEMO_ACCOUNTS = [
   },
   {
     label: "Project Manager",
-    email: "manager@mpms.com",
-    password: "Manager123!",
+    email: "mdmuzahid.dev@gmail.com",
+    password: "Manager@123",
     badge: "Manager",
   },
   {
@@ -82,7 +82,16 @@ const LoginPageView = () => {
           }),
         );
         toast.success(`Welcome back, ${response.data.user.name}!`);
-        router.push("/");
+        const role = response.data.user.role;
+        if (role === "admin") {
+          router.push("/");
+        } else if (role === "manager") {
+          router.push("/projects");
+        } else if (role === "member") {
+          router.push("/my-projects");
+        } else {
+          router.push("/");
+        }
       }
     } catch (err: unknown) {
       const apiError = err as { data?: { message?: string }; status?: number };
@@ -210,7 +219,7 @@ const LoginPageView = () => {
               <button
                 type="submit"
                 disabled={busy}
-                className="bg-primary text-primary-foreground mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium shadow-sm transition-all duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-primary text-primary-foreground mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium transition-all duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={busy ? "Signing in…" : "Sign in"}
               >
                 {busy ? (
@@ -230,7 +239,7 @@ const LoginPageView = () => {
 
           <section
             aria-label="Demo accounts"
-            className="border-border bg-muted/30 space-y-3 rounded-lg border border-dashed p-4"
+            className="border-border bg-muted/30 space-y-3 rounded-lg border-dashed p-4"
           >
             <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
               Demo accounts for testing

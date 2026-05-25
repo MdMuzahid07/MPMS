@@ -144,7 +144,7 @@ export const KanbanBoard = ({
                     onDragStart={(e) => handleDragStart(e, task.id)}
                     onDragEnd={handleDragEnd}
                     className={cn(
-                      "group border-border bg-card hover:bg-muted/40 flex cursor-grab flex-col p-4 shadow-sm transition-all duration-200 active:cursor-grabbing dark:bg-[#1b1b23]/90 dark:hover:bg-[#1b1b23]",
+                      "group border-border bg-card hover:bg-muted/40 flex cursor-grab flex-col border p-4 transition-all duration-200 active:cursor-grabbing dark:bg-[#1b1b23]/90 dark:hover:bg-[#1b1b23]",
                       draggedTaskId === task.id ? "opacity-40" : "",
                     )}
                   >

@@ -148,7 +148,7 @@ export default function SprintDetailView({ params }: SprintDetailPageProps) {
   // sprint missing fallback
   if (!activeSprint) {
     return (
-      <div className="border-border bg-card mx-auto mt-12 flex max-w-lg flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
+      <div className="border-border bg-card mx-auto mt-12 flex max-w-lg flex-col items-center justify-center rounded-xl border-dashed p-12 text-center">
         <ShieldAlert className="text-destructive mb-4 size-12 animate-bounce" />
         <h2 className="text-foreground mb-2 text-xl font-bold">
           Sprint Not Found

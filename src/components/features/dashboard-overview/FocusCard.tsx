@@ -41,7 +41,7 @@ export const FocusCard = ({ item }: FocusCardProps) => {
   const toneStyles = FOCUS_TONE_STYLES[item.tone];
 
   return (
-    <article className="border-border bg-card rounded-md border p-3.5">
+    <article className="border-border bg-card rounded-xl border p-3.5">
       <div className="flex items-start gap-3">
         <span
           className={cn(

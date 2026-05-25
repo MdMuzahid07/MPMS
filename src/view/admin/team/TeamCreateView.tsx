@@ -102,7 +102,7 @@ export default function TeamCreateView() {
 
   return (
     <div className="container mx-auto w-full pb-8">
-      <section className="bg-card/70 rounded-xl border p-5 shadow-sm backdrop-blur md:p-7">
+      <section className="bg-card/70 rounded-xl border p-5 backdrop-blur md:p-7">
         <header className="mb-6">
           <h1 className="text-foreground text-2xl font-semibold tracking-tight">
             Add New Team Member
@@ -206,7 +206,7 @@ export default function TeamCreateView() {
                     }}
                     onBlur={() => addSkill(skillInput)}
                     placeholder="Add skill..."
-                    className="h-7 rounded-sm border-0 px-0 text-xs shadow-none focus-visible:ring-0"
+                    className="h-7 rounded-sm border-0 border-none px-0 text-xs focus-visible:ring-0"
                   />
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function TeamCreateView() {
                     const dropped = event.dataTransfer.files?.[0] ?? null;
                     onFileSelected(dropped);
                   }}
-                  className="border-input hover:border-primary/50 hover:bg-muted/35 flex h-40 w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed text-center transition-colors"
+                  className="border-input hover:border-primary/50 hover:bg-muted/35 flex h-40 w-full flex-col items-center justify-center gap-2 rounded-md border-dashed text-center transition-colors"
                 >
                   {profileImage ? (
                     <>

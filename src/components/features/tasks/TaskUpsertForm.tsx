@@ -143,7 +143,7 @@ function TaskAssigneesField() {
                   <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="border-muted-foreground/40 bg-background hover:bg-muted text-muted-foreground hover:text-foreground inline-flex size-6 items-center justify-center rounded-full border border-dashed text-xs transition"
+                    className="border-muted-foreground/40 bg-background hover:bg-muted text-muted-foreground hover:text-foreground inline-flex size-6 items-center justify-center rounded-full border-dashed text-xs transition"
                     title="Add/Edit Assignees"
                   >
                     <Plus className="size-3" />
@@ -164,7 +164,7 @@ function TaskAssigneesField() {
                   onClick={() => setIsOpen(false)}
                 />
 
-                <div className="border-border bg-popover animate-in fade-in slide-in-from-top-1 absolute top-full left-0 z-50 mt-1 w-full rounded-lg border p-2 shadow-lg duration-150">
+                <div className="border-border bg-popover animate-in fade-in slide-in-from-top-1 absolute top-full left-0 z-50 mt-1 w-full rounded-lg border p-2 duration-150">
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -319,7 +319,7 @@ function TaskAttachmentsField() {
         </div>
       )}
 
-      <div className="border-border bg-muted/10 hover:bg-muted/20 relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center transition">
+      <div className="border-border bg-muted/10 hover:bg-muted/20 relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-dashed p-6 text-center transition">
         {isUploading ? (
           <div className="flex flex-col items-center justify-center space-y-2.5">
             <Loader2 className="text-primary size-6 animate-spin" />
@@ -737,9 +737,9 @@ export function TaskUpsertForm({
                               setValue("priority", p, { shouldDirty: true })
                             }
                             className={cn(
-                              "flex cursor-pointer items-center justify-center rounded-md border border-transparent py-1.5 text-xs font-semibold capitalize transition",
+                              "flex cursor-pointer items-center justify-center rounded-md border-transparent py-1.5 text-xs font-semibold capitalize transition",
                               colorMap[p],
-                              active && "border-border border shadow-sm",
+                              active && "border-border",
                             )}
                           >
                             {labelMap[p]}
@@ -850,7 +850,7 @@ export function TaskUpsertForm({
           </Button>
           <Button
             type="submit"
-            className="h-10 rounded-lg px-6 text-sm font-semibold shadow-sm"
+            className="h-10 rounded-lg border px-6 text-sm font-semibold"
             disabled={isSaving}
           >
             {isSaving

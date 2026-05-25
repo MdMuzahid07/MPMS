@@ -68,6 +68,7 @@ export function getDashboardPageTitle(pathname: string) {
 
 export function isAdministrativePath(pathname: string) {
   return (
+    pathname === "/" ||
     pathname.startsWith("/projects") ||
     pathname.startsWith("/tasks") ||
     pathname.startsWith("/team") ||

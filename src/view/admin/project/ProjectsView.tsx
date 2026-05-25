@@ -2,6 +2,7 @@
 
 import { ProjectCard } from "@/components/features/projects/ProjectCard";
 import { DeleteConfirmationModal } from "@/components/features/tasks/DeleteConfirmationModal";
+import { InfoBanner } from "@/components/shared/InfoBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -67,7 +68,7 @@ export default function ProjectsView() {
         </div>
         <Button
           asChild
-          className="h-10 w-full gap-2 px-5 font-semibold shadow-sm sm:w-auto"
+          className="h-10 w-full gap-2 border px-5 font-semibold sm:w-auto"
         >
           <Link href="/projects/new">
             <Plus className="h-4 w-4" />
@@ -77,13 +78,13 @@ export default function ProjectsView() {
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="border-border/60 bg-card/40 flex flex-col items-center gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
+      <div className="border-border/60 bg-card/40 flex flex-col items-center gap-4 rounded-xl border p-4 sm:flex-row">
         <div className="flex w-full items-center gap-4 sm:w-auto">
           <span className="text-muted-foreground text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
             Status:
           </span>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="bg-card border-border h-9 w-35 text-xs font-medium shadow-sm">
+            <SelectTrigger className="bg-card border-border h-9 w-35 border text-xs font-medium">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
@@ -107,7 +108,7 @@ export default function ProjectsView() {
             <Input
               type="text"
               placeholder="Search projects..."
-              className="bg-card border-border h-9 pl-9 text-xs shadow-sm focus-visible:ring-1"
+              className="bg-card border-border h-9 border pl-9 text-xs focus-visible:ring-1"
               value={clientQuery}
               onChange={(event) => setClientQuery(event.target.value)}
             />
@@ -118,11 +119,11 @@ export default function ProjectsView() {
           <Button
             variant="outline"
             size="icon"
-            className="bg-card border-border text-muted-foreground h-9 w-9 shadow-sm"
+            className="bg-card border-border text-muted-foreground h-9 w-9 border"
           >
             <Filter className="h-4 w-4" />
           </Button>
-          <div className="border-border bg-card flex items-center rounded-md border p-0.5 shadow-sm">
+          <div className="border-border bg-card flex items-center rounded-md border p-0.5">
             <Button
               variant="ghost"
               size="icon"
@@ -133,7 +134,7 @@ export default function ProjectsView() {
             <Button
               variant="secondary"
               size="icon"
-              className="bg-muted h-8 w-8 shadow-sm"
+              className="bg-muted h-8 w-8 border"
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
@@ -147,7 +148,7 @@ export default function ProjectsView() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="border-border/50 bg-card flex h-100 flex-col rounded-xl border shadow-sm"
+              className="border-border/50 bg-card flex h-100 flex-col rounded-xl border"
             >
               <Skeleton className="h-40 w-full rounded-t-xl rounded-b-none" />
               <div className="flex flex-1 flex-col p-5">
@@ -187,7 +188,7 @@ export default function ProjectsView() {
           ))}
         </div>
       ) : !isLoading && projects?.length === 0 ? (
-        <div className="border-border/60 bg-card/20 animate-in fade-in flex min-h-100 flex-col items-center justify-center rounded-xl border border-dashed py-12 text-center">
+        <div className="border-border/60 bg-card/20 animate-in fade-in flex min-h-100 flex-col items-center justify-center rounded-xl border-dashed py-12 text-center">
           <div className="bg-muted/50 text-muted-foreground mb-4 flex h-14 w-14 items-center justify-center rounded-full">
             <LayoutGrid className="h-6 w-6" />
           </div>
@@ -205,11 +206,11 @@ export default function ProjectsView() {
                 setStatusFilter("all");
                 setClientQuery("");
               }}
-              className="text-xs shadow-sm"
+              className="border text-xs"
             >
               Clear Filters
             </Button>
-            <Button asChild className="text-xs shadow-sm" variant="default">
+            <Button asChild className="border text-xs" variant="default">
               <Link href="/projects/new">
                 <Plus className="mr-1.5 h-3.5 w-3.5" /> New Project
               </Link>
@@ -229,16 +230,16 @@ export default function ProjectsView() {
           {/* Create New Project Placeholder Card */}
           <Link
             href="/projects/new"
-            className="group border-border/60 hover:border-primary/50 hover:bg-primary/5 flex min-h-95 flex-col items-center justify-center rounded-xl border-2 border-dashed bg-transparent p-6 text-center transition-all"
+            className="group border-border/50 hover:border-primary/30 hover:bg-primary/5 bg-card/10 flex min-h-[380px] flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center backdrop-blur-xl transition-all duration-300"
           >
-            <div className="bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-full transition-colors">
-              <Plus className="h-6 w-6" />
+            <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground mb-4 flex h-14 w-14 items-center justify-center rounded-full border transition-all duration-300 group-hover:scale-110">
+              <Plus className="h-7 w-7" />
             </div>
-            <h3 className="text-foreground text-lg font-semibold tracking-tight">
+            <h3 className="text-foreground group-hover:text-primary text-lg font-bold tracking-tight transition-colors">
               New Project
             </h3>
-            <p className="text-muted-foreground mt-2 max-w-50 text-xs font-light">
-              Start a new venture by configuring a workspace.
+            <p className="text-muted-foreground mt-2 max-w-[200px] text-xs leading-relaxed font-medium">
+              Start a new venture by configuring a custom project workspace.
             </p>
           </Link>
         </div>
@@ -254,6 +255,8 @@ export default function ProjectsView() {
         confirmLabel={isDeleting ? "Deleting..." : "Delete"}
         onConfirm={handleDelete}
       />
+
+      <InfoBanner message="This page displays all your strategic projects. You can filter by status, search by client, and manage high-level project details here." />
     </div>
   );
 }

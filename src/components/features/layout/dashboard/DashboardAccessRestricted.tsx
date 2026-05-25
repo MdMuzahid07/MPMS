@@ -22,7 +22,7 @@ export function DashboardAccessRestricted({
       </p>
       <Link
         href="/my-tasks"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 mt-6 inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 mt-6 inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold transition"
       >
         Return to My Tasks
       </Link>

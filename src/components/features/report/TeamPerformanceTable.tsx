@@ -15,7 +15,7 @@ export const TeamPerformanceTable = ({
   onExportCSV,
 }: TeamPerformanceTableProps) => {
   return (
-    <div className="border-border bg-card rounded-md border p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl font-semibold tracking-tight">
           Team Performance Breakdown
@@ -34,7 +34,7 @@ export const TeamPerformanceTable = ({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse">
           <thead className="bg-muted/20">
-            <tr className="border-border border-y">
+            <tr className="border-border-y">
               <th className="px-3 py-2.5 text-left text-[10px] font-semibold tracking-[0.12em] uppercase">
                 Member
               </th>
@@ -50,9 +50,20 @@ export const TeamPerformanceTable = ({
             </tr>
           </thead>
           <tbody>
-            {members.map((member) => (
-              <TeamMemberRow key={member.id} member={member} />
-            ))}
+            {members.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="text-muted-foreground py-8 text-center text-sm italic"
+                >
+                  No team members found.
+                </td>
+              </tr>
+            ) : (
+              members.map((member) => (
+                <TeamMemberRow key={member.id} member={member} />
+              ))
+            )}
           </tbody>
         </table>
       </div>

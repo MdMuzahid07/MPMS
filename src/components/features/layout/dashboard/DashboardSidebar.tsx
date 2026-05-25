@@ -58,7 +58,7 @@ function SidebarNavItem({ item, isActive }: SidebarNavItemProps) {
         asChild
         isActive={isActive}
         tooltip={item.name}
-        className="hover:bg-sidebar-accent hover:text-sidebar-foreground active:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-primary h-10 rounded-md px-3 text-[14px] font-medium data-[active=true]:shadow-none"
+        className="hover:bg-sidebar-accent hover:text-sidebar-foreground active:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-primary h-10 rounded-md px-3 text-[14px] font-medium data-[active=true]:border-none"
       >
         <Link href={item.href}>
           <span className="flex size-5 shrink-0 items-center justify-center">
@@ -120,7 +120,7 @@ export function DashboardSidebar({
       onMouseEnter={handleSidebarMouseEnter}
       onMouseLeave={handleSidebarMouseLeave}
     >
-      <SidebarHeader className="border-sidebar-border border-b px-3 pt-3 pb-2 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="border-sidebar-border-b px-3 pt-3 pb-2 group-data-[collapsible=icon]:px-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex h-12 items-center gap-3 rounded-md px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">

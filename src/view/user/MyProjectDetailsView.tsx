@@ -58,7 +58,7 @@ export default function MyProjectDetailsView() {
       {/* Project Overview Section */}
       <div className="grid grid-cols-12 gap-6">
         {/* Main Info Card */}
-        <div className="bg-card border-border col-span-12 flex flex-col justify-between rounded-xl border p-6 shadow-xs md:p-8 lg:col-span-8">
+        <div className="bg-card border-border col-span-12 flex flex-col justify-between rounded-xl border p-6 md:p-8 lg:col-span-8">
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <span className="bg-primary/10 border-primary/20 text-primary flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
@@ -123,7 +123,7 @@ export default function MyProjectDetailsView() {
 
         {/* Progress & Stats Card */}
         <div className="col-span-12 lg:col-span-4">
-          <div className="bg-card border-border flex h-full flex-col justify-between rounded-xl border p-6 shadow-xs">
+          <div className="bg-card border-border flex h-full flex-col justify-between rounded-xl border p-6">
             <div>
               <h2 className="text-foreground mb-6 text-base font-semibold">
                 Execution Status
@@ -164,7 +164,7 @@ export default function MyProjectDetailsView() {
             </div>
 
             <div className="border-border mt-6 border-t pt-6">
-              <button className="bg-primary text-primary-foreground w-full rounded-lg py-3 text-sm font-bold shadow-sm transition-all hover:opacity-90 active:scale-98">
+              <button className="bg-primary text-primary-foreground w-full rounded-lg border py-3 text-sm font-bold transition-all hover:opacity-90 active:scale-98">
                 GENERATE REPORT
               </button>
             </div>
@@ -183,7 +183,7 @@ export default function MyProjectDetailsView() {
               onClick={() =>
                 router.push(`/my-projects/${projectId}/sprints/${sprint.id}`)
               }
-              className="group bg-card border-border hover:border-primary/40 flex cursor-pointer flex-col items-center gap-4 rounded-lg border p-4 shadow-xs transition-all duration-200 md:flex-row md:gap-6"
+              className="group bg-card border-border hover:border-primary/40 flex cursor-pointer flex-col items-center gap-4 rounded-lg border p-4 transition-all duration-200 md:flex-row md:gap-6"
             >
               {/* Conditional Icon Rendering based on status */}
               <div className="bg-background border-border flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border">

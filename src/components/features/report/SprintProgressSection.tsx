@@ -8,7 +8,7 @@ interface SprintProgressSectionProps {
 
 export const SprintProgressSection = ({}: SprintProgressSectionProps) => {
   return (
-    <div className="border-border bg-card rounded-md border p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">

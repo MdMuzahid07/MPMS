@@ -34,7 +34,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
   return (
     <div
       onClick={() => onClick?.(projectId)}
-      className="bg-card border-border hover:border-primary/40 group flex cursor-pointer flex-col justify-between rounded-lg border p-6 shadow-xs transition-all duration-200"
+      className="bg-card border-border hover:border-primary/40 group flex cursor-pointer flex-col justify-between rounded-lg border p-6 transition-all duration-200"
     >
       <div>
         <div className="mb-4 flex items-start justify-between">

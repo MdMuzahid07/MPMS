@@ -4,7 +4,7 @@ export const TeamTableSkeleton = () => (
   <div className="animate-in fade-in overflow-x-auto duration-200">
     <table className="w-full min-w-245 border-collapse">
       <thead className="bg-muted/35">
-        <tr className="border-border border-b">
+        <tr className="border-border-b">
           <th className="text-muted-foreground px-5 py-3 text-left text-[10px] font-semibold tracking-wider uppercase">
             Member
           </th>
@@ -25,7 +25,7 @@ export const TeamTableSkeleton = () => (
       </thead>
       <tbody>
         {[...Array(5)].map((_, i) => (
-          <tr key={i} className="border-border border-b">
+          <tr key={i} className="border-border-b">
             <td className="px-5 py-3.5">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-10 w-10 rounded-full" />

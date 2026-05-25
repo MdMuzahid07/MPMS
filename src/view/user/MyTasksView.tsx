@@ -129,7 +129,7 @@ export default function MyTasksView() {
 
         {/* Dynamic Metric Dial Badge */}
         <div className="flex items-center gap-3">
-          <div className="border-border bg-card/80 flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-xs font-semibold shadow-sm">
+          <div className="border-border bg-card/80 flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-xs font-semibold">
             <span className="text-muted-foreground">Sprint 4 Completion:</span>
             <span className="text-foreground font-bold">{completionRate}%</span>
             <span className="text-muted-foreground">
@@ -142,7 +142,7 @@ export default function MyTasksView() {
       {/* KPI Dashboard Blocks */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Metric 1 */}
-        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4 shadow-sm">
+        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4">
           <div className="space-y-1">
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Total Workload
@@ -158,7 +158,7 @@ export default function MyTasksView() {
         </div>
 
         {/* Metric 2 */}
-        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4 shadow-sm">
+        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4">
           <div className="space-y-1">
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               In Progress
@@ -176,7 +176,7 @@ export default function MyTasksView() {
         </div>
 
         {/* Metric 3 */}
-        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4 shadow-sm">
+        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4">
           <div className="space-y-1">
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Under Review
@@ -194,7 +194,7 @@ export default function MyTasksView() {
         </div>
 
         {/* Metric 4 */}
-        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4 shadow-sm">
+        <div className="border-border/60 bg-card flex items-center justify-between rounded-xl border p-4">
           <div className="space-y-1">
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Urgent Focus
