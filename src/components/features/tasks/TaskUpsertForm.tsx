@@ -497,7 +497,7 @@ export function TaskUpsertForm({
   // Pre-populate values on update
   useEffect(() => {
     if (mode === "update" && taskData) {
-      const tData = taskData as any;
+      const tData = (taskData as any)?.data || taskData;
       const statusMap: Record<string, string> = {
         TODO: "todo",
         IN_PROGRESS: "in-progress",
@@ -580,6 +580,10 @@ export function TaskUpsertForm({
         estimate: Number(data.estimatedHours) || undefined,
         assignees: data.assignees,
         attachments: data.attachments,
+        subtasks: data.subtasks?.map((st) => ({
+          title: st.title,
+          completed: st.done,
+        })),
       };
 
       const targetSprintId =

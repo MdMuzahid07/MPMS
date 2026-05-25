@@ -1,4 +1,4 @@
-import TaskDetailsView from "@/view/admin/task/TaskDetailsView";
+import TaskUpdateView from "@/view/admin/task/TaskUpdateView";
 
 export default async function page({
   params,
@@ -6,5 +6,5 @@ export default async function page({
   params: Promise<{ id: string; sprintId: string; taskId: string }>;
 }) {
   const resolvedParams = await params;
-  return <TaskDetailsView params={resolvedParams} />;
+  return <TaskUpdateView params={resolvedParams} />;
 }

@@ -11,13 +11,22 @@ import { FilePenLine, Info, MoreVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type { TaskItem } from "./task.types";
 
+import { usePathname } from "next/navigation";
+
 interface TaskActionsMenuProps {
   task: TaskItem;
   onDelete: (task: TaskItem) => void;
 }
 
 export const TaskActionsMenu = ({ task, onDelete }: TaskActionsMenuProps) => {
-  const detailsUrl = `/projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId}`;
+  const pathname = usePathname();
+  const isUserPanel =
+    pathname.includes("/my-projects") || pathname.includes("/my-tasks");
+
+  const detailsUrl = isUserPanel
+    ? `/my-projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId}`
+    : `/projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId}`;
+  const editUrl = `${detailsUrl}/edit`;
 
   return (
     <DropdownMenu>
@@ -33,16 +42,23 @@ export const TaskActionsMenu = ({ task, onDelete }: TaskActionsMenuProps) => {
             Details
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href={detailsUrl}>
-            <FilePenLine className="size-3.5" />
-            Edit
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onSelect={() => onDelete(task)}>
-          <Trash2 className="size-3.5" />
-          Delete
-        </DropdownMenuItem>
+        {!isUserPanel && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href={editUrl}>
+                <FilePenLine className="size-3.5" />
+                Edit
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={() => onDelete(task)}
+            >
+              <Trash2 className="size-3.5" />
+              Delete
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

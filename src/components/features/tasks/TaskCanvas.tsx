@@ -17,6 +17,8 @@ import { KanbanBoard } from "./KanbanBoard";
 import type { TaskItem, TaskStatus } from "./task.types";
 import { TaskEditForm } from "./TaskEditForm";
 import { TasksTable } from "./TasksTable";
+import { useDeleteTaskMutation } from "@/redux/feature/tasks/tasksApi";
+import { toast } from "sonner";
 
 interface TaskCanvasProps {
   initialTasks: TaskItem[];
@@ -31,6 +33,7 @@ export const TaskCanvas = ({
   subtitle,
   hideFiltersForMember = false,
 }: TaskCanvasProps) => {
+  const [deleteTask] = useDeleteTaskMutation();
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
 
@@ -112,12 +115,20 @@ export const TaskCanvas = ({
     );
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deletingTask) return;
-    setTasks((prev) => prev.filter((t) => t.id !== deletingTask.id));
-    setSelectedTaskIds((prev) => prev.filter((id) => id !== deletingTask.id));
-    setIsDeleteDialogOpen(false);
-    setDeletingTask(null);
+    try {
+      await deleteTask(deletingTask.id).unwrap();
+      setTasks((prev) => prev.filter((t) => t.id !== deletingTask.id));
+      setSelectedTaskIds((prev) => prev.filter((id) => id !== deletingTask.id));
+      toast.success("Task deleted successfully.");
+    } catch (err) {
+      console.error("Delete task error:", err);
+      toast.error("Failed to delete task.");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeletingTask(null);
+    }
   };
 
   const handleSelectTask = (
