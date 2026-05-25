@@ -16,6 +16,7 @@ import {
   TeamTableSkeleton,
 } from "@/components/features/team";
 import { Button } from "@/components/ui/button";
+import TeamViewSkeleton from "@/skeleton/team/TeamViewSkeleton";
 import {
   Select,
   SelectContent,
@@ -166,6 +167,10 @@ export const TeamView = () => {
         </Button>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <TeamViewSkeleton />;
   }
 
   // ======= Derived properties from backend response =======

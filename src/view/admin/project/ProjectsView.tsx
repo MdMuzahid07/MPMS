@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce"; // Ensure this exists, or use local timeout. We'll use a local timeout.
 import { handleApiError } from "@/lib/handleApiError";
+import ProjectsViewSkeleton from "@/skeleton/projects/ProjectsViewSkeleton";
 import {
   useDeleteProjectMutation,
   useGetProjectsQuery,
@@ -144,49 +144,7 @@ export default function ProjectsView() {
 
       {/* Projects Grid */}
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-border/50 bg-card flex h-100 flex-col rounded-xl border"
-            >
-              <Skeleton className="h-40 w-full rounded-t-xl rounded-b-none" />
-              <div className="flex flex-1 flex-col p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-2.5">
-                    <Skeleton className="h-5 w-4/5" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                  <Skeleton className="h-6 w-12" />
-                </div>
-                <div className="mt-8 space-y-2">
-                  <div className="flex justify-between">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                  <Skeleton className="h-1.5 w-full" />
-                </div>
-                <div className="mt-8 flex items-center justify-between">
-                  <div className="space-y-1.5">
-                    <Skeleton className="h-2 w-12" />
-                    <Skeleton className="h-3 w-20" />
-                  </div>
-                  <div className="flex -space-x-2">
-                    <Skeleton className="h-6 w-6 rounded-full" />
-                    <Skeleton className="h-6 w-6 rounded-full" />
-                  </div>
-                </div>
-                <div className="border-border/50 mt-6 flex items-center justify-between border-t pt-4">
-                  <Skeleton className="h-8 w-24" />
-                  <div className="flex gap-1">
-                    <Skeleton className="h-7 w-7" />
-                    <Skeleton className="h-7 w-7" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProjectsViewSkeleton />
       ) : !isLoading && projects?.length === 0 ? (
         <div className="border-border/60 bg-card/20 animate-in fade-in flex min-h-100 flex-col items-center justify-center rounded-xl border-dashed py-12 text-center">
           <div className="bg-muted/50 text-muted-foreground mb-4 flex h-14 w-14 items-center justify-center rounded-full">

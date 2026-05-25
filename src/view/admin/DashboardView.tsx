@@ -10,14 +10,9 @@ import {
   useGetProjectsReportQuery,
 } from "@/redux/feature/reports/reportsApi";
 import { InfoBanner } from "@/components/shared/InfoBanner";
-import {
-  Bolt,
-  BriefcaseBusiness,
-  ListChecks,
-  Loader2,
-  Users,
-} from "lucide-react";
+import { Bolt, BriefcaseBusiness, ListChecks, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import DashboardViewSkeleton from "@/skeleton/dashboard/DashboardViewSkeleton";
 
 export default function DashboardView() {
   const router = useRouter();
@@ -29,11 +24,7 @@ export default function DashboardView() {
     useGetProjectsReportQuery();
 
   if (isOverviewLoading || isProjectsLoading) {
-    return (
-      <div className="flex h-[80vh] w-full items-center justify-center">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <DashboardViewSkeleton />;
   }
 
   // Fallbacks

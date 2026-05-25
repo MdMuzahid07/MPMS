@@ -13,7 +13,8 @@ import {
   useGetOverviewReportQuery,
   useGetUsersReportQuery,
 } from "@/redux/feature/reports/reportsApi";
-import { Loader2, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
+import ReportsViewSkeleton from "@/skeleton/reports/ReportsViewSkeleton";
 
 export interface ReportViewProps {
   onExportCSV?: () => void;
@@ -36,11 +37,7 @@ export const ReportView = ({
   } = useGetUsersReportQuery();
 
   if (isOverviewLoading || isUsersLoading) {
-    return (
-      <div className="flex h-[80vh] w-full items-center justify-center">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <ReportsViewSkeleton />;
   }
 
   if (overviewError || usersError) {

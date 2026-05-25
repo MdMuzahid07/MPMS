@@ -9,7 +9,8 @@ import type {
   TaskPriority,
 } from "@/components/features/tasks/task.types";
 import { useGetAllTasksQuery } from "@/redux/feature/tasks/tasksApi";
-import { Loader2, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
+import TasksViewSkeleton from "@/skeleton/tasks/TasksViewSkeleton";
 
 import { InfoBanner } from "@/components/shared/InfoBanner";
 
@@ -48,11 +49,7 @@ export const TasksView = () => {
   const { data, isLoading, error } = useGetAllTasksQuery({ limit: 100 });
 
   if (isLoading) {
-    return (
-      <div className="flex h-[70vh] w-full items-center justify-center">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <TasksViewSkeleton />;
   }
 
   if (error || !data) {
