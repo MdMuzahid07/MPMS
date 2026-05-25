@@ -18,7 +18,7 @@ interface StatBlockProps {
 
 export const StatBlock = ({ item }: StatBlockProps) => {
   return (
-    <article className="border-border bg-card rounded-md border p-4">
+    <article className="border-border bg-card rounded-xl border p-4">
       <div className="mb-4 flex items-start justify-between">
         <span className="border-border bg-muted/35 text-muted-foreground inline-flex size-8 items-center justify-center rounded-md border">
           {item.icon}
