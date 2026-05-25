@@ -212,12 +212,6 @@ export default function MyProjectDetailsView() {
                 </div>
               </div>
             </div>
-
-            <div className="border-border mt-6 border-t pt-6">
-              <button className="bg-primary text-primary-foreground w-full rounded-lg border py-3 text-sm font-bold transition-all hover:opacity-90 active:scale-98">
-                GENERATE REPORT
-              </button>
-            </div>
           </div>
         </div>
       </div>

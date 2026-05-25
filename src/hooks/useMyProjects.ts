@@ -33,7 +33,7 @@ export const useMyProjects = () => {
   const activeTasks = useMemo(() => {
     if (!tasksData?.tasks) return [];
     return tasksData.tasks
-      .filter((t) => t.status !== "done")
+      .filter((t) => t.status !== "DONE")
       .map((t) => ({
         id: t._id,
         title: t.title,

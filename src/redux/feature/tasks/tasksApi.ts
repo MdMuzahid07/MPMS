@@ -9,6 +9,7 @@ export const tasksApi = baseApi.injectEndpoints({
         url: `/sprint/${sprintId}/tasks`,
         method: "GET",
       }),
+      transformResponse: (response: { data: Task[] }) => response.data,
       providesTags: ["tasks"],
     }),
     getAllTasks: builder.query<{ tasks: Task[]; pagination: any }, any>({
@@ -44,6 +45,7 @@ export const tasksApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      transformResponse: (response: { data: Task }) => response.data,
       invalidatesTags: ["tasks"],
     }),
     getTaskById: builder.query<Task, string>({
@@ -75,6 +77,7 @@ export const tasksApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
+      transformResponse: (response: { data: Task }) => response.data,
       invalidatesTags: ["tasks"],
     }),
     deleteTask: builder.mutation<{ success: boolean; message: string }, string>(
@@ -83,6 +86,9 @@ export const tasksApi = baseApi.injectEndpoints({
           url: `/tasks/${taskId}`,
           method: "DELETE",
         }),
+        transformResponse: (response: {
+          data: { success: boolean; message: string };
+        }) => response.data,
         invalidatesTags: ["tasks"],
       },
     ),
@@ -103,6 +109,7 @@ export const tasksApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      transformResponse: (response: { data: unknown }) => response.data,
       invalidatesTags: ["tasks"],
     }),
     deleteComment: builder.mutation<
@@ -113,6 +120,7 @@ export const tasksApi = baseApi.injectEndpoints({
         url: `/tasks/${taskId}/comments/${commentId}`,
         method: "DELETE",
       }),
+      transformResponse: (response: { data: unknown }) => response.data,
       invalidatesTags: ["tasks"],
     }),
     getActivityLogs: builder.query<unknown[], string>({

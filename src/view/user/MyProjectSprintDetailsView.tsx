@@ -58,8 +58,8 @@ export default function MyProjectSprintDetailsView() {
     if (!task) return;
 
     if (
-      task.status === "review" &&
-      newStatus === "done" &&
+      task.status === "REVIEW" &&
+      newStatus === "DONE" &&
       user?.role === "member"
     ) {
       toast.error("Only managers can approve tasks from Review to Done.");
@@ -70,9 +70,7 @@ export default function MyProjectSprintDetailsView() {
       await updateTask({
         taskId: id,
         data: {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          status: newStatus as "todo" | "in_progress" | "review" | "done",
+          status: newStatus as "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE",
         },
       }).unwrap();
       toast.success("Task status updated");
@@ -231,19 +229,20 @@ export default function MyProjectSprintDetailsView() {
                     <div className="col-span-4 md:col-span-2">
                       <span
                         className={`flex w-fit items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-bold uppercase ${
-                          task.priority === "high" || task.priority === "urgent"
+                          task.priority === "HIGH" ||
+                          task.priority === "CRITICAL"
                             ? "bg-destructive/10 text-destructive border-destructive/20"
-                            : task.priority === "medium"
+                            : task.priority === "MEDIUM"
                               ? "bg-warning/10 text-warning border-warning/20"
                               : "bg-secondary-container/50 text-on-secondary-container border-outline-variant"
                         }`}
                       >
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
-                            task.priority === "high" ||
-                            task.priority === "urgent"
+                            task.priority === "HIGH" ||
+                            task.priority === "CRITICAL"
                               ? "bg-destructive"
-                              : task.priority === "medium"
+                              : task.priority === "MEDIUM"
                                 ? "bg-warning"
                                 : "bg-secondary"
                           }`}
@@ -271,10 +270,10 @@ export default function MyProjectSprintDetailsView() {
                         }
                         className="bg-surface-container-high text-on-surface focus:ring-primary w-full cursor-pointer rounded border-none px-2.5 py-1 text-xs outline-hidden focus:ring-1"
                       >
-                        <option value="todo">To Do</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="review">Review</option>
-                        <option value="done">Done</option>
+                        <option value="TODO">To Do</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="REVIEW">Review</option>
+                        <option value="DONE">Done</option>
                       </select>
                     </div>
                   </div>

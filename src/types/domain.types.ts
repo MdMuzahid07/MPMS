@@ -49,8 +49,8 @@ export interface Sprint {
   updatedAt: string;
 }
 
-export type TaskStatus = "todo" | "in_progress" | "review" | "done";
-export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export interface Comment {
   _id: string;

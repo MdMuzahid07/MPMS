@@ -8,6 +8,7 @@ export const sprintsApi = baseApi.injectEndpoints({
         url: `/projects/${projectId}/sprints`,
         method: "GET",
       }),
+      transformResponse: (response: { data: Sprint[] }) => response.data,
       providesTags: ["sprints"],
     }),
     createSprint: builder.mutation<
@@ -27,6 +28,7 @@ export const sprintsApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      transformResponse: (response: { data: Sprint }) => response.data,
       invalidatesTags: ["sprints"],
     }),
     updateSprint: builder.mutation<
@@ -47,6 +49,7 @@ export const sprintsApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
+      transformResponse: (response: { data: Sprint }) => response.data,
       invalidatesTags: ["sprints"],
     }),
     deleteSprint: builder.mutation<
@@ -57,6 +60,7 @@ export const sprintsApi = baseApi.injectEndpoints({
         url: `/projects/${projectId}/sprints/${sprintId}`,
         method: "DELETE",
       }),
+      transformResponse: (response: { data: void }) => response.data,
       invalidatesTags: ["sprints"],
     }),
   }),

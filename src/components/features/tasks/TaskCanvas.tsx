@@ -122,11 +122,14 @@ export const TaskCanvas = ({
       return;
     }
 
-    const statusMapReverse: Record<TaskStatus, string> = {
-      "To Do": "todo",
-      Progress: "in_progress",
-      Review: "review",
-      Done: "done",
+    const statusMapReverse: Record<
+      TaskStatus,
+      "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE"
+    > = {
+      "To Do": "TODO",
+      Progress: "IN_PROGRESS",
+      Review: "REVIEW",
+      Done: "DONE",
     };
 
     // Optimistic update
@@ -138,13 +141,7 @@ export const TaskCanvas = ({
       await updateTask({
         taskId,
         data: {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          status: statusMapReverse[newStatus] as
-            | "todo"
-            | "in_progress"
-            | "review"
-            | "done",
+          status: statusMapReverse[newStatus],
         },
       }).unwrap();
       toast.success(`Task moved to ${newStatus}`);

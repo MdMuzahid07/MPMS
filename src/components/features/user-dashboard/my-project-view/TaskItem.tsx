@@ -17,6 +17,10 @@ interface TaskItemProps {
 }
 
 const PRIORITY_COLOR: Record<string, string> = {
+  HIGH: "text-destructive",
+  CRITICAL: "text-destructive font-black",
+  MEDIUM: "text-amber-500",
+  LOW: "text-muted-foreground",
   high: "text-destructive",
   urgent: "text-destructive font-black",
   medium: "text-amber-500",
