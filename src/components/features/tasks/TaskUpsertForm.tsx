@@ -108,7 +108,7 @@ function TaskAssigneesField() {
         render={({ fieldState }) => (
           <div>
             {/* Popover trigger */}
-            <div className="border-input bg-background/50 ring-offset-background flex min-h-[38px] w-full flex-wrap items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50">
+            <div className="border-input bg-background/50 ring-offset-background flex min-h-9.5 w-full flex-wrap items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50">
               {assignees.length === 0 ? (
                 <button
                   type="button"
@@ -299,7 +299,7 @@ function TaskAttachmentsField() {
                   href={att.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-primary flex max-w-[250px] items-center gap-2 truncate text-xs font-semibold hover:underline"
+                  className="text-primary flex max-w-62.5 items-center gap-2 truncate text-xs font-semibold hover:underline"
                 >
                   <Paperclip className="size-3.5" />
                   {att.filename}
@@ -319,7 +319,7 @@ function TaskAttachmentsField() {
         </div>
       )}
 
-      <div className="border-border bg-muted/10 hover:bg-muted/20 relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-dashed p-6 text-center transition">
+      <div className="border-border bg-muted/10 hover:bg-muted/20 relative flex min-h-30 cursor-pointer flex-col items-center justify-center rounded-xl border-dashed p-6 text-center transition">
         {isUploading ? (
           <div className="flex flex-col items-center justify-center space-y-2.5">
             <Loader2 className="text-primary size-6 animate-spin" />

@@ -160,7 +160,7 @@ export default function MyTasksView() {
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Under Review
             </p>
-            <h3 className="text-foreground text-2xl font-bold text-amber-400">
+            <h3 className="text-foreground text-2xl font-bold">
               {reviewTasks}
             </h3>
             <p className="text-muted-foreground text-[10px]">
@@ -178,7 +178,7 @@ export default function MyTasksView() {
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Urgent Focus
             </p>
-            <h3 className="text-foreground text-2xl font-bold text-rose-400">
+            <h3 className="text-foreground text-2xl font-bold">
               {urgentTasks.length}
             </h3>
             <p className="text-muted-foreground text-[10px]">

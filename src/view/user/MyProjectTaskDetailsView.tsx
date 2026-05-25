@@ -98,7 +98,7 @@ export default function MyProjectTaskDetailsView() {
 
   if (isTaskLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="flex min-h-100 items-center justify-center">
         <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
       </div>
     );
@@ -106,7 +106,7 @@ export default function MyProjectTaskDetailsView() {
 
   if (!task) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="flex min-h-100 items-center justify-center">
         <p className="text-muted-foreground">Task not found.</p>
       </div>
     );
@@ -283,7 +283,7 @@ export default function MyProjectTaskDetailsView() {
                           (comment.author?.name || "User")
                       }
                     />
-                    <div className="flex-grow">
+                    <div className="grow">
                       <div className="mb-1 flex items-center gap-3">
                         <span className="text-on-surface text-sm font-bold">
                           {comment.author?.name || "Unknown User"}
@@ -319,11 +319,11 @@ export default function MyProjectTaskDetailsView() {
                             <div className="bg-primary-container/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
                               <CornerDownRight className="h-4 w-4" />
                             </div>
-                            <div className="flex-grow">
+                            <div className="grow">
                               <textarea
                                 value={nestedReply}
                                 onChange={(e) => setNestedReply(e.target.value)}
-                                className="bg-background border-border focus:ring-primary focus:border-primary text-on-surface placeholder:text-text-muted min-h-[80px] w-full resize-none rounded-lg border p-3 text-sm outline-hidden focus:ring-1"
+                                className="bg-background border-border focus:ring-primary focus:border-primary text-on-surface placeholder:text-text-muted min-h-20 w-full resize-none rounded-lg border p-3 text-sm outline-hidden focus:ring-1"
                                 placeholder="Write a reply..."
                               />
                               <div className="mt-2 flex justify-end gap-2">
@@ -368,7 +368,7 @@ export default function MyProjectTaskDetailsView() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="bg-surface-container-low border-border focus-within:border-primary focus-within:ring-primary/30 rounded-xl border p-4 transition-all focus-within:ring-1">
                     <textarea
                       value={newComment}
@@ -467,7 +467,7 @@ export default function MyProjectTaskDetailsView() {
                   <div className="bg-surface-container-highest text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                     <FileText className="h-5 w-5" />
                   </div>
-                  <div className="min-w-0 flex-grow">
+                  <div className="min-w-0 grow">
                     <p className="text-on-surface truncate text-sm font-semibold">
                       {att.filename}
                     </p>
@@ -496,21 +496,21 @@ export default function MyProjectTaskDetailsView() {
           </div>
 
           {/* Activity Logs Timeline */}
-          <div className="bg-surface border-border flex max-h-[600px] flex-col overflow-hidden rounded-xl border">
+          <div className="bg-surface border-border flex max-h-150 flex-col overflow-hidden rounded-xl border">
             <div className="border-border bg-surface-container-low/20 border-b p-6">
               <h3 className="text-on-surface-variant text-xs font-bold tracking-widest uppercase">
                 Activity Log
               </h3>
             </div>
 
-            <div className="custom-scrollbar flex-grow space-y-6 overflow-y-auto p-6">
+            <div className="custom-scrollbar grow space-y-6 overflow-y-auto p-6">
               {((activityLogs as ActivityLogItem[]) || []).map(
                 (log: ActivityLogItem, idx: number) => (
                   <div key={idx} className="relative flex gap-4">
                     {idx !==
                       ((activityLogs as ActivityLogItem[])?.length || 0) -
                         1 && (
-                      <div className="bg-outline-variant absolute top-[24px] bottom-[-28px] left-[11px] w-[1px]" />
+                      <div className="bg-outline-variant absolute top-6 -bottom-7 left-2.75 w-px" />
                     )}
                     <div className="bg-primary/20 border-primary/40 text-primary z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
                       <RefreshCw className="h-3 w-3" />

@@ -1,9 +1,11 @@
+import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
+import Preloader from "@/components/shared/Preloader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,11 +28,13 @@ export const metadata: Metadata = {
     "Plan sprints, assign tasks, and ship projects — built for teams that move fast.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const hasVisited = cookieStore.get("onyx_first_visit");
   return (
     <html
       lang="en"
@@ -46,7 +50,9 @@ export default function RootLayout({
           storageKey="MPMS-theme-v2"
         >
           <TooltipProvider>
-            <ReduxProvider>{children}</ReduxProvider>
+            <ReduxProvider>
+              <Preloader hasVisited={!!hasVisited}>{children}</Preloader>
+            </ReduxProvider>
           </TooltipProvider>
         </ThemeProvider>
         <Toaster

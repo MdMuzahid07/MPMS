@@ -239,7 +239,7 @@ export const TaskCanvas = ({
       <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {/* Quick Search */}
-          <div className="relative max-w-md flex-grow">
+          <div className="relative max-w-md grow">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               type="text"

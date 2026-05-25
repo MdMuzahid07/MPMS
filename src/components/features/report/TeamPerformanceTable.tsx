@@ -32,7 +32,7 @@ export const TeamPerformanceTable = ({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] border-collapse">
+        <table className="w-full min-w-190 border-collapse">
           <thead className="bg-muted/20">
             <tr className="border-border-y">
               <th className="px-3 py-2.5 text-left text-[10px] font-semibold tracking-[0.12em] uppercase">

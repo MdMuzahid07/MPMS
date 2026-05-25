@@ -134,7 +134,7 @@ const LoginPageView = () => {
           </Link>
         </nav>
 
-        <div className="mx-auto my-auto w-full max-w-112 space-y-7 py-6">
+        <div className="mx-auto my-auto w-full max-w-md space-y-7 py-6">
           {/* Logo — visible only on mobile (AuthHero carries it on desktop) */}
           <div className="mb-6 flex justify-center lg:hidden">
             <OnyxLogo />
@@ -254,7 +254,7 @@ const LoginPageView = () => {
                   key={email}
                   type="button"
                   onClick={() => handleQuickSelect(email, password)}
-                  className="border-border/50 bg-card hover:bg-primary/[0.02] hover:border-primary/45 group flex cursor-pointer flex-col justify-between rounded-xl border p-3 text-left shadow-xs transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                  className="border-border/50 bg-card hover:bg-primary/2 hover:border-primary/45 group flex cursor-pointer flex-col justify-between rounded-xl border p-3 text-left shadow-xs transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
                   aria-label={`Load demo credentials for ${label}`}
                 >
                   <div className="w-full">

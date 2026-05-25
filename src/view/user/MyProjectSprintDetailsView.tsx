@@ -189,7 +189,7 @@ export default function MyProjectSprintDetailsView() {
         {/* Expandable Task List Table */}
         <div className="border-outline-variant bg-surface-container-lowest overflow-hidden rounded-xl border">
           {/* Task Table Header */}
-          <div className="border-outline-variant bg-surface-container-low text-on-surface-variant grid hidden grid-cols-12 gap-4 border-b px-6 py-4 text-xs font-bold tracking-wider uppercase md:grid">
+          <div className="border-outline-variant bg-surface-container-low text-on-surface-variant grid grid-cols-12 gap-4 border-b px-6 py-4 text-xs font-bold tracking-wider uppercase md:grid">
             <div className="col-span-6">Task Title</div>
             <div className="col-span-2">Priority</div>
             <div className="col-span-2">Estimate</div>
@@ -309,7 +309,7 @@ export default function MyProjectSprintDetailsView() {
                                 className="bg-surface-container-low border-outline-variant/40 flex items-center gap-1 rounded border px-2 py-1"
                               >
                                 <Paperclip className="text-primary h-3.5 w-3.5" />
-                                <span className="max-w-[150px] truncate">
+                                <span className="max-w-37.5 truncate">
                                   {file.split("/").pop()}
                                 </span>
                               </div>
