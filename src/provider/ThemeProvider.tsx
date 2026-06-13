@@ -22,7 +22,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({
   defaultTheme = "system",
   enableSystem = true,
   disableTransitionOnChange = false,
-  storageKey = "MPMS-theme",
+  storageKey = "onyx-theme",
   themes = ["light", "dark", "system"],
   ...props
 }) => {

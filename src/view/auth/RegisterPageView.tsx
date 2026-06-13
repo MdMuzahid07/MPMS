@@ -94,7 +94,7 @@ const RegisterPageView = () => {
 
       if (response.success) {
         toast.success("Account created! Please sign in.", {
-          description: `Welcome to MPMS, ${data.name.split(" ")[0]}!`,
+          description: `Welcome to Onyx, ${data.name.split(" ")[0]}!`,
         });
         router.push("/login");
       }
@@ -148,7 +148,7 @@ const RegisterPageView = () => {
               Create Account
             </h1>
             <p className="text-muted-foreground text-sm font-light">
-              Get started with MPMS and organise your team&apos;s workflow.
+              Get started with Onyx and organise your team&apos;s workflow.
             </p>
           </header>
 

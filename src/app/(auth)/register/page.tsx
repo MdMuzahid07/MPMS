@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sign Up",
-  description: "Enroll a new secure credential node in MPMS.",
+  description: "Enroll a new secure credential node in Onyx.",
 };
 
 export default function RegisterPage() {

@@ -18,7 +18,7 @@ const AuthHero = () => {
 
       {/* Top Left Logo Area */}
       <div className="absolute top-16 left-16 z-20 flex items-center gap-2">
-        <OnyxLogo />
+        <OnyxLogo forceLight />
       </div>
 
       {/* Center Text Section */}

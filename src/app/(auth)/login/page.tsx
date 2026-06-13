@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to your MPMS account.",
+  description: "Sign in to your Onyx account.",
 };
 
 export default function LoginPage() {

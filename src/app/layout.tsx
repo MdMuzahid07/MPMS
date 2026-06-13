@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MPMS",
-    template: "%s | MPMS",
+    default: "Onyx",
+    template: "%s | Onyx",
   },
   description:
     "Plan sprints, assign tasks, and ship projects — built for teams that move fast.",
@@ -47,7 +47,7 @@ export default async function RootLayout({
           defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange={false}
-          storageKey="MPMS-theme-v2"
+          storageKey="onyx-theme-v2"
         >
           <TooltipProvider>
             <ReduxProvider>

@@ -332,7 +332,7 @@ export function DashboardSidebar({
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Sign out of MPMS?</AlertDialogTitle>
+                      <AlertDialogTitle>Sign out of Onyx?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This will end your current session. You will need to log
                         in again to access your projects and tasks.

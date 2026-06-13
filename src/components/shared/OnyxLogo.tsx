@@ -1,7 +1,9 @@
 export default function OnyxLogo({
   className = "h-16",
+  forceLight = false,
 }: {
   className?: string;
+  forceLight?: boolean;
 }) {
   return (
     <svg
@@ -89,7 +91,7 @@ export default function OnyxLogo({
       <text
         x="135"
         y="85"
-        className="fill-foreground"
+        className={forceLight ? "fill-white" : "fill-foreground"}
         fontFamily="var(--font-heading), ui-sans-serif, system-ui, sans-serif"
         fontSize="76"
         fontWeight="800"
@@ -104,7 +106,7 @@ export default function OnyxLogo({
       <text
         x="139"
         y="118"
-        className="fill-muted-foreground"
+        className={forceLight ? "fill-slate-300" : "fill-muted-foreground"}
         fontFamily="var(--font-sans), ui-sans-serif, system-ui, sans-serif"
         fontSize="24"
         fontWeight="400"

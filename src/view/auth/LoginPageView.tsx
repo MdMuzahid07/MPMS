@@ -20,20 +20,20 @@ import AuthHero from "./AuthHero";
 const DEMO_ACCOUNTS = [
   {
     label: "Admin Workspace",
-    email: "mpms.admin@gmail.com",
-    password: "MPMS@Admin12345",
+    email: "onyx.admin@gmail.com",
+    password: "Onyx@Admin12345",
     badge: "Admin",
   },
   {
     label: "Project Manager",
-    email: "mdmuzahid.dev@gmail.com",
-    password: "Manager@123",
+    email: "sarah.jenkins@company.com",
+    password: "Onyx@User123",
     badge: "Manager",
   },
   {
     label: "Team Member",
-    email: "member@mpms.com",
-    password: "Member123!",
+    email: "david.kim@company.com",
+    password: "Onyx@User123",
     badge: "Member",
   },
 ] as const;
