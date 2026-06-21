@@ -216,9 +216,13 @@ export default function SprintDetailView({ params }: SprintDetailPageProps) {
           year: "numeric",
         })
       : "No due date",
-    projectId: id,
-    sprintId: sprintId,
+    projectId: task.project?._id || task.project || "",
+    sprintId: task.sprint?._id || task.sprint || "",
     taskId: task._id,
+    isTimerRunning: task.isTimerRunning,
+    timerStartedAt: task.timerStartedAt,
+    timeSpend: task.timeSpend,
+    isTimerStopped: task.isTimerStopped,
   }));
 
   // Calculations for stats

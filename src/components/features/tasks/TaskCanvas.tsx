@@ -18,10 +18,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useRouter, usePathname } from "next/navigation";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { KanbanBoard } from "./KanbanBoard";
 import type { TaskItem, TaskStatus } from "./task.types";
-import { TaskEditForm } from "./TaskEditForm";
 import { TasksTable } from "./TasksTable";
 
 interface TaskCanvasProps {
@@ -38,6 +38,8 @@ export const TaskCanvas = ({
   hideFiltersForMember = false,
 }: TaskCanvasProps) => {
   const { user } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+  const pathname = usePathname();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
@@ -58,9 +60,7 @@ export const TaskCanvas = ({
   // Selection state
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
 
-  // Edit & Delete modal states
-  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // Delete modal states
   const [deletingTask, setDeletingTask] = useState<TaskItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -153,12 +153,6 @@ export const TaskCanvas = ({
       console.error("Update task status error:", err);
       toast.error("Failed to update task status.");
     }
-  };
-
-  const handleSaveEdit = (updatedTask: TaskItem) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)),
-    );
   };
 
   const handleDeleteConfirm = async () => {
@@ -398,8 +392,13 @@ export const TaskCanvas = ({
             tasks={filteredTasks}
             onStatusChange={handleStatusChange}
             onSelectTask={(task) => {
-              setEditingTask(task);
-              setIsEditDialogOpen(true);
+              const isUserPanel =
+                pathname.includes("/my-projects") ||
+                pathname.includes("/my-tasks");
+              const detailsUrl = isUserPanel
+                ? `/my-projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId || task.id}`
+                : `/projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId || task.id}`;
+              router.push(detailsUrl);
             }}
             onDeleteTask={(task) => {
               setDeletingTask(task);
@@ -419,14 +418,6 @@ export const TaskCanvas = ({
           />
         )}
       </div>
-
-      {/* Interactive Sheet Form & Confirm Dialog */}
-      <TaskEditForm
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        task={editingTask}
-        onSave={handleSaveEdit}
-      />
 
       <DeleteConfirmationModal
         open={isDeleteDialogOpen}

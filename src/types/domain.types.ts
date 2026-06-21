@@ -80,6 +80,10 @@ export interface Task {
   attachments?: string[];
   comments?: Comment[];
   activityLogs?: ActivityLog[];
+  isTimerRunning?: boolean;
+  timerStartedAt?: string | null;
+  timeSpend?: number;
+  isTimerStopped?: boolean;
   createdAt: string;
   updatedAt: string;
 }

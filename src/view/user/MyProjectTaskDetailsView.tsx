@@ -244,6 +244,7 @@ export default function MyProjectTaskDetailsView() {
                       : "Not estimated"
                   }
                 </p>
+                <button>Start Task</button>
               </div>
             </div>
 

@@ -58,6 +58,10 @@ export default function MyTasksView() {
       projectId: t.projectId,
       sprintId: t.sprintId,
       taskId: t._id,
+      isTimerRunning: t.isTimerRunning,
+      timerStartedAt: t.timerStartedAt,
+      timeSpend: t.timeSpend,
+      isTimerStopped: t.isTimerStopped,
     }));
   }, [tasksData, displayName]);
 

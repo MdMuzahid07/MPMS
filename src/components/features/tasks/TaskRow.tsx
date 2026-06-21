@@ -7,6 +7,8 @@ import { PriorityBadge } from "./PriorityBadge";
 import { StatusBadge } from "./StatusBadge";
 import type { TaskItem } from "./task.types";
 import { TaskActionsMenu } from "./TaskActionsMenu";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface TaskRowProps {
   task: TaskItem;
@@ -21,6 +23,14 @@ export const TaskRow = ({
   onSelect,
   onDelete,
 }: TaskRowProps) => {
+  const pathname = usePathname();
+  const isUserPanel =
+    pathname.includes("/my-projects") || pathname.includes("/my-tasks");
+
+  const detailsUrl = isUserPanel
+    ? `/my-projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId || task.id}`
+    : `/projects/${task.projectId}/sprints/${task.sprintId}/tasks/${task.taskId || task.id}`;
+
   return (
     <tr className="border-border-b">
       <td className="px-3 py-3.5">
@@ -30,9 +40,11 @@ export const TaskRow = ({
         />
       </td>
       <td className="px-3 py-3.5">
-        <p className="max-w-55 text-sm leading-snug font-semibold">
-          {task.title}
-        </p>
+        <Link href={detailsUrl}>
+          <p className="hover:text-primary max-w-55 cursor-pointer text-sm leading-snug font-semibold transition-colors">
+            {task.title}
+          </p>
+        </Link>
         <p className="text-muted-foreground mt-1 text-[10px] font-semibold">
           {task.code}
         </p>

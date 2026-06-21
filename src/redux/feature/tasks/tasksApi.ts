@@ -131,6 +131,18 @@ export const tasksApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: unknown[] }) => response.data,
       providesTags: ["tasks"],
     }),
+    toggleTimer: builder.mutation<
+      Task,
+      { taskId: string; action: "start" | "stop" }
+    >({
+      query: ({ taskId, action }) => ({
+        url: `/tasks/${taskId}/timer`,
+        method: "PATCH",
+        body: { action },
+      }),
+      transformResponse: (response: { data: Task }) => response.data,
+      invalidatesTags: ["tasks"],
+    }),
   }),
 });
 
@@ -145,4 +157,5 @@ export const {
   useCreateCommentMutation,
   useDeleteCommentMutation,
   useGetActivityLogsQuery,
+  useToggleTimerMutation,
 } = tasksApi;

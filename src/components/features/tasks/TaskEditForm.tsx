@@ -18,7 +18,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { TaskItem, TaskPriority, TaskStatus } from "./task.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Clock, Play, CheckCircle } from "lucide-react";
+import { useToggleTimerMutation } from "@/redux/feature/tasks/tasksApi";
+import { toast } from "sonner";
+import { useAppSelector } from "@/redux/hooks";
 
 type TaskEditFormProps = {
   open: boolean;
@@ -74,7 +78,57 @@ export function TaskEditForm({
   task,
   onSave,
 }: TaskEditFormProps) {
+  const [toggleTimer, { isLoading: isTogglingTimer }] =
+    useToggleTimerMutation();
+  const [elapsedTime, setElapsedTime] = useState<string>("00:00:00");
   const [draft, setDraft] = useState<TaskEditDraft>(() => createDraft(task));
+  const { user } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!task?.isTimerRunning || !task?.timerStartedAt) {
+      return;
+    }
+
+    const tick = () => {
+      const start = new Date(task.timerStartedAt!).getTime();
+      const now = Date.now();
+      const diffMs = now - start;
+
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      setElapsedTime(
+        `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`,
+      );
+    };
+
+    const timeoutId = setTimeout(tick, 0);
+    const interval = setInterval(tick, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+      setElapsedTime("00:00:00");
+    };
+  }, [task?.isTimerRunning, task?.timerStartedAt]);
+
+  const handleToggleTimer = async () => {
+    if (!task) return;
+    const action = task.isTimerRunning ? "stop" : "start";
+    try {
+      await toggleTimer({ taskId: task.taskId, action }).unwrap();
+      toast.success(
+        action === "start"
+          ? "Task started."
+          : "Task stopped and marked as Done.",
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to toggle timer.");
+    }
+  };
 
   const [prevTask, setPrevTask] = useState<TaskItem | null>(null);
   if (task !== prevTask) {
@@ -110,6 +164,55 @@ export function TaskEditForm({
         </SheetHeader>
 
         <div className="space-y-4 px-4">
+          {task && (
+            <div
+              className={`flex flex-col gap-2 rounded-lg border p-3 ${
+                task.isTimerStopped
+                  ? "border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400"
+                  : "bg-muted"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold">
+                    {task.isTimerStopped
+                      ? "Time taken to complete this task"
+                      : "Time Tracking"}
+                  </span>
+                  <div className="mt-1 flex items-center gap-1.5 font-mono text-sm">
+                    <Clock className="size-3.5" />
+                    {task.isTimerRunning
+                      ? elapsedTime
+                      : task.timeSpend
+                        ? `${task.timeSpend.toFixed(2)} hrs`
+                        : "00:00:00"}
+                  </div>
+                </div>
+                {user?.role === "member" && !task.isTimerStopped && (
+                  <Button
+                    variant={task.isTimerRunning ? "destructive" : "default"}
+                    size="sm"
+                    className="h-8 gap-1.5 font-bold"
+                    onClick={handleToggleTimer}
+                    disabled={isTogglingTimer}
+                  >
+                    {task.isTimerRunning ? (
+                      <>
+                        <CheckCircle className="size-3.5" />
+                        Task Completed
+                      </>
+                    ) : (
+                      <>
+                        <Play className="size-3.5 fill-current" />
+                        Start Task
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <label className="text-xs font-semibold">Task Title</label>
             <Input

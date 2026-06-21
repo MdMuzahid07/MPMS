@@ -89,6 +89,10 @@ export const TasksView = () => {
     projectId: task.project?._id || task.project || "",
     sprintId: task.sprint?._id || task.sprint || "",
     taskId: task._id,
+    isTimerRunning: task.isTimerRunning,
+    timerStartedAt: task.timerStartedAt,
+    timeSpend: task.timeSpend,
+    isTimerStopped: task.isTimerStopped,
   }));
 
   return (

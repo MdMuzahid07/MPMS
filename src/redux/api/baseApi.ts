@@ -93,13 +93,6 @@ export type TagType = (typeof tagTypes)[keyof typeof tagTypes];
 
 const baseApi = createApi({
   reducerPath: "baseApi",
-  // baseQuery: fetchBaseQuery({
-  //     baseUrl: "http://localhost:5000/api/v1",
-  //     credentials: "include"
-  // }),
-  // cleaner syntax => just storing in a variable and using here
-  // we calling baseQuery in our custom base query, thats why it will call from there
-  // because we called our baseQuery in our custom base query thats why we need to set here the custom one
   baseQuery: baseQueryWithRefreshToken,
   tagTypes: Object.values(tagTypes),
   endpoints: () => ({}),

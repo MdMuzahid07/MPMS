@@ -14,4 +14,8 @@ export type TaskItem = {
   projectId: string;
   sprintId: string;
   taskId: string;
+  isTimerRunning?: boolean;
+  timerStartedAt?: string | null;
+  timeSpend?: number;
+  isTimerStopped?: boolean;
 };

@@ -10,12 +10,14 @@ import {
   useCreateCommentMutation,
   useDeleteCommentMutation,
   useGetActivityLogsQuery,
+  useToggleTimerMutation,
 } from "@/redux/feature/tasks/tasksApi";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "@/redux/hooks";
 import {
   ArrowLeft,
   Calendar,
@@ -28,6 +30,7 @@ import {
   Users,
   CheckSquare,
   Square,
+  Play,
   BadgeAlert,
   ClipboardList,
   MessageSquare,
@@ -57,10 +60,13 @@ export default function TaskDetailsView({
     error,
   } = useGetTaskByIdQuery(params.taskId);
   const [updateTask] = useUpdateTaskMutation();
+  const { user } = useAppSelector((state) => state.auth);
 
   // Dynamic comments and activity logs queries
   const { data: comments = [] } = useGetCommentsQuery(params.taskId);
   const { data: activityLogs = [] } = useGetActivityLogsQuery(params.taskId);
+  const [toggleTimer, { isLoading: isTogglingTimer }] =
+    useToggleTimerMutation();
 
   const [createComment, { isLoading: isPostingComment }] =
     useCreateCommentMutation();
@@ -70,6 +76,54 @@ export default function TaskDetailsView({
 
   // Unpack task data safely
   const task = (taskData as any)?.data || taskData;
+
+  const [elapsedTime, setElapsedTime] = useState<string>("00:00:00");
+
+  useEffect(() => {
+    if (!task?.isTimerRunning || !task?.timerStartedAt) {
+      return;
+    }
+
+    const tick = () => {
+      const start = new Date(task.timerStartedAt).getTime();
+      const now = Date.now();
+      const diffMs = now - start;
+
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      setElapsedTime(
+        `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`,
+      );
+    };
+
+    const timeoutId = setTimeout(tick, 0);
+    const interval = setInterval(tick, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+      setElapsedTime("00:00:00");
+    };
+  }, [task?.isTimerRunning, task?.timerStartedAt]);
+
+  const handleToggleTimer = async () => {
+    if (!task) return;
+    const action = task.isTimerRunning ? "stop" : "start";
+    try {
+      await toggleTimer({ taskId: task._id, action }).unwrap();
+      toast.success(
+        action === "start"
+          ? "Task started."
+          : "Task stopped and marked as Done.",
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to toggle timer.");
+    }
+  };
 
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -458,6 +512,65 @@ export default function TaskDetailsView({
 
         {/* Right contextual meta column */}
         <div className="space-y-8">
+          {/* Time Tracking Card */}
+          <div className="border-border bg-card/40 space-y-5 rounded-2xl border p-6 backdrop-blur-xs">
+            <h3 className="text-muted-foreground border-border/60 flex items-center gap-2 border-b pb-3 text-xs font-bold tracking-widest uppercase">
+              <Clock className="text-primary h-4.5 w-4.5" />
+              Time Tracking
+            </h3>
+
+            <div className="flex flex-col gap-4">
+              {task.isTimerStopped ? (
+                <div className="flex flex-col gap-1.5 rounded-xl border border-green-500/20 bg-green-500/10 p-4.5 text-green-600 dark:text-green-400">
+                  <span className="flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                    <span className="h-2 w-2 rounded-full bg-green-500" />
+                    Completed
+                  </span>
+                  <span className="mt-1 text-sm font-semibold">
+                    (
+                    {task.timeSpend
+                      ? `${task.timeSpend.toFixed(2)} hrs`
+                      : "0.00 hrs"}
+                    ) Time taken to complete this task
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm font-semibold">
+                      Elapsed Time
+                    </span>
+                    <span className="text-foreground font-mono text-xl font-bold">
+                      {task.isTimerRunning
+                        ? elapsedTime
+                        : task.timeSpend
+                          ? `${task.timeSpend.toFixed(2)} hrs`
+                          : "00:00:00"}
+                    </span>
+                  </div>
+                  {user?.role === "member" && (
+                    <Button
+                      variant={task.isTimerRunning ? "destructive" : "default"}
+                      className="w-full gap-2 font-bold"
+                      onClick={handleToggleTimer}
+                      disabled={isTogglingTimer}
+                    >
+                      {task.isTimerRunning ? (
+                        <>
+                          <CheckCircle className="h-4 w-4" /> Task Completed
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4 fill-current" /> Start Task
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Metadata Card */}
           <div className="border-border bg-card/40 space-y-5 rounded-2xl border p-6 backdrop-blur-xs">
             <h3 className="text-muted-foreground border-border/60 border-b pb-3 text-xs font-bold tracking-widest uppercase">
