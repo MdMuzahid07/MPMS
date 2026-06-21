@@ -95,7 +95,7 @@ export const KanbanBoard = ({
   );
 
   return (
-    <div className="grid min-w-225 grid-cols-1 gap-4 overflow-x-auto pb-4 md:grid-cols-4 lg:gap-6">
+    <div className="flex w-full items-start gap-4 overflow-x-auto pb-4 lg:gap-6">
       {COLUMNS.map((col) => {
         const columnTasks = groupedTasks[col.status] || [];
         const isOver = activeColumn === col.status;
@@ -107,7 +107,7 @@ export const KanbanBoard = ({
             onDragLeave={() => setActiveColumn(null)}
             onDrop={(e) => handleDrop(e, col.status)}
             className={cn(
-              "border-border/40 bg-muted/40 flex h-[620px] flex-col rounded-xl border p-3 transition-all duration-200",
+              "border-border/40 bg-muted/40 flex h-[620px] w-full min-w-[270px] flex-1 shrink-0 flex-col rounded-xl border p-3 transition-all duration-200 sm:min-w-[290px] md:min-w-[310px]",
               isOver
                 ? "border-primary/40 bg-primary/2 ring-primary/20 scale-[0.99] ring-1"
                 : "",

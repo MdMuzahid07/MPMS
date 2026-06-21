@@ -20,12 +20,34 @@ import {
   useGetProjectsQuery,
 } from "@/redux/feature/projects/projectsApi";
 import type { Project } from "@/types/domain.types";
-import { Filter, LayoutGrid, List, Plus, Search } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import {
+  Filter,
+  LayoutGrid,
+  List,
+  Plus,
+  Search,
+  CalendarDays,
+  ExternalLink,
+  Edit2,
+  Trash2,
+  MoreVertical,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function ProjectsView() {
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [statusFilter, setStatusFilter] = useState("all");
   const [clientQuery, setClientQuery] = useState("");
   const debouncedQuery = useDebounce(clientQuery, 300);
@@ -125,16 +147,26 @@ export default function ProjectsView() {
           </Button>
           <div className="border-border bg-card flex items-center rounded-md border p-0.5">
             <Button
-              variant="ghost"
+              variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
-              className="text-muted-foreground hover:text-foreground h-8 w-8"
+              className={`h-8 w-8 ${
+                viewMode === "list"
+                  ? "bg-muted text-foreground border"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
             </Button>
             <Button
-              variant="secondary"
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
-              className="bg-muted h-8 w-8 border"
+              className={`h-8 w-8 ${
+                viewMode === "grid"
+                  ? "bg-muted text-foreground border"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setViewMode("grid")}
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
@@ -175,7 +207,7 @@ export default function ProjectsView() {
             </Button>
           </div>
         </div>
-      ) : (
+      ) : viewMode === "grid" ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {projects?.map((project) => (
             <ProjectCard
@@ -200,6 +232,196 @@ export default function ProjectsView() {
               Start a new venture by configuring a custom project workspace.
             </p>
           </Link>
+        </div>
+      ) : (
+        <div className="border-border/60 bg-card overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-245 border-collapse text-left">
+            <thead className="bg-muted/15 border-border border-b">
+              <tr>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Project Name
+                </th>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Client
+                </th>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Status
+                </th>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Timeline
+                </th>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Budget
+                </th>
+                <th className="text-muted-foreground px-5 py-4 text-xs font-bold tracking-wider uppercase">
+                  Team
+                </th>
+                <th className="w-12 px-5 py-4" />
+              </tr>
+            </thead>
+            <tbody className="divide-border/40 divide-y">
+              {projects?.map((project) => {
+                const getStatusStyle = (status: Project["status"]) => {
+                  switch (status) {
+                    case "active":
+                      return "border-indigo-500/30 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400";
+                    case "completed":
+                      return "border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400";
+                    case "planned":
+                      return "border-blue-500/30 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+                    case "archived":
+                      return "border-amber-500/30 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400";
+                    default:
+                      return "border-muted bg-muted/50 text-muted-foreground";
+                  }
+                };
+
+                const getStatusDot = (status: Project["status"]) => {
+                  switch (status) {
+                    case "active":
+                      return "bg-indigo-500";
+                    case "completed":
+                      return "bg-emerald-500";
+                    case "planned":
+                      return "bg-blue-500";
+                    case "archived":
+                      return "bg-amber-500";
+                    default:
+                      return "bg-muted-foreground";
+                  }
+                };
+
+                return (
+                  <tr
+                    key={project._id}
+                    className="hover:bg-muted/10 border-border/40 border-b transition-colors last:border-b-0"
+                  >
+                    <td className="px-5 py-4">
+                      <Link
+                        href={`/projects/${project._id}`}
+                        className="text-foreground hover:text-primary block text-sm font-bold transition-colors"
+                      >
+                        {project.title}
+                      </Link>
+                    </td>
+                    <td className="text-muted-foreground px-5 py-4 text-xs font-semibold tracking-wider uppercase">
+                      {project.client}
+                    </td>
+                    <td className="px-5 py-4">
+                      <Badge
+                        variant="outline"
+                        className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${getStatusStyle(
+                          project.status,
+                        )}`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${getStatusDot(
+                            project.status,
+                          )}`}
+                        />
+                        {project.status}
+                      </Badge>
+                    </td>
+                    <td className="text-foreground/80 px-5 py-4 text-xs font-semibold">
+                      <div className="flex items-center gap-1.5">
+                        <CalendarDays className="text-primary h-3.5 w-3.5 shrink-0 opacity-80" />
+                        <span>
+                          {project.startDate
+                            ? format(
+                                new Date(project.startDate),
+                                "MMM dd, yyyy",
+                              )
+                            : "TBD"}{" "}
+                          —{" "}
+                          {project.endDate
+                            ? format(new Date(project.endDate), "MMM dd, yyyy")
+                            : "TBD"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-foreground px-5 py-4 text-xs font-bold">
+                      {project.budget
+                        ? `$${project.budget.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}`
+                        : "$0.00"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex -space-x-1.5 overflow-hidden p-0.5">
+                        {project.members?.slice(0, 3).map((member) => {
+                          const initials = member.name
+                            .substring(0, 2)
+                            .toUpperCase();
+                          return (
+                            <Avatar
+                              key={member._id}
+                              className="ring-background border-border/50 inline-block h-6 w-6 rounded-full border ring-2"
+                            >
+                              <AvatarImage src={member.avatar} alt={initials} />
+                              <AvatarFallback className="bg-muted text-muted-foreground text-[9px] font-bold">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                          );
+                        })}
+                        {(project.members?.length ?? 0) > 3 && (
+                          <div className="bg-muted border-border/50 ring-background flex h-6 w-6 items-center justify-center rounded-full border ring-2">
+                            <span className="text-foreground/70 text-[9px] font-extrabold">
+                              +{(project.members?.length ?? 0) - 3}
+                            </span>
+                          </div>
+                        )}
+                        {(!project.members || project.members.length === 0) && (
+                          <span className="text-muted-foreground text-xs font-medium italic">
+                            No team
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:bg-muted h-8 w-8 rounded-lg border-none"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-40 rounded-xl border"
+                        >
+                          <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link href={`/projects/${project._id}`}>
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link href={`/projects/${project._id}/edit`}>
+                              <Edit2 className="mr-2 h-4 w-4" />
+                              Edit Project
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                            onClick={() => setPendingDelete(project)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 

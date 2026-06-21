@@ -18,7 +18,7 @@ interface ProjectsTableProps {
 
 export const ProjectsTable = ({ projects, onViewAll }: ProjectsTableProps) => {
   return (
-    <div className="border-border bg-card/45 space-y-5 rounded-2xl border p-5 backdrop-blur-xs">
+    <div className="border-border bg-card/45 w-full space-y-5 overflow-hidden rounded-2xl border p-5 backdrop-blur-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h2 className="text-foreground text-xl font-bold tracking-tight">

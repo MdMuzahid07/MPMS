@@ -42,7 +42,7 @@ export function DashboardTopbar({
 
       <div className="flex items-center gap-2 sm:gap-3">
         {!isTeamRoute && (
-          <label className="relative hidden w-65 md:block lg:w-90">
+          <label className="relative hidden w-65 lg:block lg:w-90">
             <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
             <input
               type="search"

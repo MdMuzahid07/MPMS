@@ -25,14 +25,7 @@ import {
 import { SunMoonIcon } from "@/components/ui/sun-moon";
 import type { User } from "@/redux/feature/auth/authSlice";
 import { useGetProjectsQuery } from "@/redux/feature/projects/projectsApi";
-import {
-  ArrowRight,
-  LogOut,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Pin,
-  Plus,
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, LogOut, Pin, Plus } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -111,7 +104,7 @@ export function DashboardSidebar({
   pathname,
   onLogout,
 }: DashboardSidebarProps) {
-  const { isMobile, open, setOpen } = useSidebar();
+  const { isMobile, open, setOpen, setOpenMobile } = useSidebar();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const activeTheme = resolvedTheme ?? theme;
   const navItems = getDashboardNavItems(user?.role);
@@ -141,11 +134,15 @@ export function DashboardSidebar({
   };
 
   const handlePinToggle = () => {
-    setIsPinnedOpen((prev) => {
-      const next = !prev;
-      setOpen(next);
-      return next;
-    });
+    if (isMobile) {
+      setOpenMobile(false);
+    } else {
+      setIsPinnedOpen((prev) => {
+        const next = !prev;
+        setOpen(next);
+        return next;
+      });
+    }
   };
 
   return (
@@ -164,16 +161,16 @@ export function DashboardSidebar({
               <button
                 type="button"
                 onClick={handlePinToggle}
-                className="text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground inline-flex size-7 items-center justify-center rounded-md group-data-[collapsible=icon]:hidden"
+                className="text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground border-sidebar-border/30 hover:border-sidebar-border/80 inline-flex size-8 items-center justify-center rounded-lg border bg-transparent transition-all duration-200 group-data-[collapsible=icon]:hidden"
                 aria-label={
                   isPinnedOpen ? "Collapse sidebar" : "Pin sidebar open"
                 }
               >
-                {isPinnedOpen ? (
-                  <PanelLeftClose className="size-4" />
-                ) : (
-                  <PanelLeftOpen className="size-4" />
-                )}
+                <ChevronLeft
+                  className={`size-4.5 transition-transform duration-200 ${
+                    !isPinnedOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
             </div>
           </SidebarMenuItem>
