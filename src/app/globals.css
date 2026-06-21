@@ -184,6 +184,12 @@
   html {
     @apply font-sans;
   }
+  button,
+  select,
+  a,
+  [role="button"] {
+    cursor: pointer;
+  }
 }
 
 /* Custom premium scrollbar for Webkit browsers (Chrome, Safari, Edge) */

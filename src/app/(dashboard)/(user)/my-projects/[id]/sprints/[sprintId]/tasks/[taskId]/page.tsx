@@ -1,10 +1,5 @@
-import TaskDetailsView from "@/view/admin/task/TaskDetailsView";
+import MyProjectTaskDetailsView from "@/view/user/MyProjectTaskDetailsView";
 
-export default async function page({
-  params,
-}: {
-  params: Promise<{ id: string; sprintId: string; taskId: string }>;
-}) {
-  const resolvedParams = await params;
-  return <TaskDetailsView params={resolvedParams} showEdit={false} />;
+export default function page() {
+  return <MyProjectTaskDetailsView />;
 }

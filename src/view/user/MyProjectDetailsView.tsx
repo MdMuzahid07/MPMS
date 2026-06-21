@@ -2,6 +2,7 @@
 
 import { Bolt, CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -90,79 +91,120 @@ export default function MyProjectDetailsView() {
       {/* Project Overview Section */}
       <div className="grid grid-cols-12 gap-6">
         {/* Main Info Card */}
-        <div className="bg-card border-border col-span-12 flex flex-col justify-between rounded-xl border p-6 md:p-8 lg:col-span-8">
-          <div>
-            <div className="mb-4 flex flex-wrap items-center gap-3">
-              <span className="bg-primary/10 border-primary/20 text-primary flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase">
-                <span className="bg-primary h-1.5 w-1.5 rounded-full" />
+        <div className="bg-card border-border col-span-12 flex flex-col overflow-hidden rounded-xl border lg:col-span-8">
+          {/* Hero Cover Image Banner */}
+          <div className="relative h-48 w-full border-b md:h-56">
+            <Image
+              src={
+                project.thumbnail ||
+                "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop"
+              }
+              alt={project.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 1024px) 100vw, 66vw"
+            />
+            <div className="absolute inset-0 bg-black/10" />
+
+            {/* Glassmorphic Status & ID Overlaid */}
+            <div className="absolute bottom-4 left-6 flex items-center gap-3">
+              <span
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase backdrop-blur-md",
+                  project.status.toLowerCase() === "active"
+                    ? "border-indigo-500/30 bg-indigo-50/90 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
+                    : project.status.toLowerCase() === "completed"
+                      ? "border-emerald-500/30 bg-emerald-50/90 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
+                      : project.status.toLowerCase() === "planned"
+                        ? "border-blue-500/30 bg-blue-50/90 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
+                        : "border-amber-500/30 bg-amber-50/90 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-1.5 w-1.5 rounded-full",
+                    project.status.toLowerCase() === "active"
+                      ? "bg-indigo-500"
+                      : project.status.toLowerCase() === "completed"
+                        ? "bg-emerald-500"
+                        : project.status.toLowerCase() === "planned"
+                          ? "bg-blue-500"
+                          : "bg-amber-500",
+                  )}
+                />
                 {project.status.replace("_", " ")}
               </span>
-              <span className="text-muted-foreground text-xs font-medium">
-                • Project ID: PRJ-{project._id.slice(-6).toUpperCase()}
+              <span className="rounded-md border border-white/10 bg-black/35 px-2.5 py-0.5 text-xs font-medium text-white/80 backdrop-blur-xs">
+                ID: PRJ-{project._id.slice(-6).toUpperCase()}
               </span>
             </div>
-
-            <h1 className="text-foreground mb-4 text-2xl font-bold tracking-tight md:text-3xl">
-              {project.title}
-            </h1>
-
-            <p className="text-muted-foreground mb-6 max-w-2xl text-sm leading-relaxed md:text-base">
-              {project.description}
-            </p>
           </div>
 
-          <div className="border-border grid grid-cols-2 gap-6 border-t pt-6 sm:grid-cols-4">
+          <div className="flex flex-1 flex-col justify-between p-6 md:p-8">
             <div>
-              <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
-                Client
-              </p>
-              <p className="text-foreground text-sm font-semibold">
-                {project.client}
+              <h1 className="text-foreground mb-4 text-2xl font-bold tracking-tight md:text-3xl">
+                {project.title}
+              </h1>
+
+              <p className="text-muted-foreground mb-6 max-w-2xl text-sm leading-relaxed md:text-base">
+                {project.description}
               </p>
             </div>
-            <div>
-              <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
-                Lead
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="border-border relative h-5 w-5 shrink-0 overflow-hidden rounded-full border bg-neutral-800">
-                  {typeof project.createdBy === "object" &&
-                    project.createdBy.avatar && (
-                      <Image
-                        src={project.createdBy.avatar}
-                        alt="Lead"
-                        fill
-                        className="object-cover"
-                        sizes="20px"
-                      />
-                    )}
-                </div>
+
+            <div className="border-border grid grid-cols-2 gap-6 border-t pt-6 sm:grid-cols-4">
+              <div>
+                <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
+                  Client
+                </p>
                 <p className="text-foreground text-sm font-semibold">
-                  {typeof project.createdBy === "object"
-                    ? project.createdBy.name
-                    : "Unknown Lead"}
+                  {project.client}
                 </p>
               </div>
-            </div>
-            <div>
-              <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
-                Deadline
-              </p>
-              <p className="text-foreground text-sm font-semibold">
-                {format(new Date(project.endDate), "MMM dd, yyyy")}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
-                Budget
-              </p>
-              <p className="text-foreground text-sm font-semibold">
-                $
-                {project.budget.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <div>
+                <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
+                  Lead
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="border-border relative h-5 w-5 shrink-0 overflow-hidden rounded-full border bg-neutral-800">
+                    {typeof project.createdBy === "object" &&
+                      project.createdBy.avatar && (
+                        <Image
+                          src={project.createdBy.avatar}
+                          alt="Lead"
+                          fill
+                          className="object-cover"
+                          sizes="20px"
+                        />
+                      )}
+                  </div>
+                  <p className="text-foreground text-sm font-semibold">
+                    {typeof project.createdBy === "object"
+                      ? project.createdBy.name
+                      : "Unknown Lead"}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
+                  Deadline
+                </p>
+                <p className="text-foreground text-sm font-semibold">
+                  {format(new Date(project.endDate), "MMM dd, yyyy")}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground mb-1 text-xs font-bold tracking-wider uppercase">
+                  Budget
+                </p>
+                <p className="text-foreground text-sm font-semibold">
+                  $
+                  {project.budget.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
             </div>
           </div>
         </div>
