@@ -107,7 +107,7 @@ export const KanbanBoard = ({
             onDragLeave={() => setActiveColumn(null)}
             onDrop={(e) => handleDrop(e, col.status)}
             className={cn(
-              "border-border/40 bg-muted/40 flex min-h-125 flex-col rounded-xl border p-3 transition-all duration-200",
+              "border-border/40 bg-muted/40 flex h-[620px] flex-col rounded-xl border p-3 transition-all duration-200",
               isOver
                 ? "border-primary/40 bg-primary/2 ring-primary/20 scale-[0.99] ring-1"
                 : "",
@@ -131,7 +131,7 @@ export const KanbanBoard = ({
             </div>
 
             {/* Column Task Cards */}
-            <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto pr-1">
               {columnTasks.length === 0 ? (
                 <div className="border-border/30 text-muted-foreground/60 flex min-h-50 flex-1 flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center text-xs">
                   Drop tasks here
@@ -144,7 +144,7 @@ export const KanbanBoard = ({
                     onDragStart={(e) => handleDragStart(e, task.id)}
                     onDragEnd={handleDragEnd}
                     className={cn(
-                      "group border-border bg-card hover:bg-muted/40 flex cursor-grab flex-col border p-4 transition-all duration-200 active:cursor-grabbing dark:bg-[#1b1b23]/90 dark:hover:bg-[#1b1b23]",
+                      "group border-border bg-card hover:bg-muted/40 flex shrink-0 cursor-grab flex-col border p-4 transition-all duration-200 active:cursor-grabbing dark:bg-[#1b1b23]/90 dark:hover:bg-[#1b1b23]",
                       draggedTaskId === task.id ? "opacity-40" : "",
                     )}
                   >

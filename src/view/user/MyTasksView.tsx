@@ -35,12 +35,8 @@ export default function MyTasksView() {
   const displayName = user?.name ?? "Team Member";
 
   const { data: tasksData } = useGetAllTasksQuery(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    { assignee: user?._id },
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    { skip: !user?._id },
+    { assignee: user?.id },
+    { skip: !user?.id },
   );
 
   const tasks: TaskItem[] = useMemo(() => {
